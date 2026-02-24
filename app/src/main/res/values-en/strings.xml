@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Where am I?</string>
+    <string name="selecciona_nivel">Select a level</string>
+    <string name="facil">Easy</string>
+    <string name="medio">Medium</string>
+    <string name="dificil">Difficult</string>
+    <string name="selecciona_lugar">Select a place</string>
+    <string name="intentos_res">"Remaining attempts: "</string>
+    <string name="ayuda">AI assistance</string>
+</resources>

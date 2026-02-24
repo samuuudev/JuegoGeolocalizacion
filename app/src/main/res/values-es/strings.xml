@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">¿Dónde estoy?</string>
     <string name="selecciona_nivel">Selecciona un nivel</string>
@@ -7,5 +8,4 @@
     <string name="selecciona_lugar">Elige un lugar</string>
     <string name="intentos_res">"Intentos restantes: "</string>
     <string name="ayuda">Ayuda con IA</string>
-
 </resources>
