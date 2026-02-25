@@ -91,7 +91,7 @@ fun PantallaJuego(
             MapOSM(
                 sitio = sitio,
                 onMapTap = {
-                    CambiadorSonido.repoducirSonido(context, R.raw.tocarMapa)
+                    CambiadorSonido.repoducirSonido(context, R.raw.tocar_mapa)
                     if(intentos > 0) {
                         intentos--
 

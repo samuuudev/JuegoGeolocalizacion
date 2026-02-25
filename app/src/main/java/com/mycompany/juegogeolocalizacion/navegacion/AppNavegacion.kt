@@ -61,7 +61,7 @@ fun AppNavegacion() {
         // Parte para la pantalla donde saldran las puntuaciones
         composable(Navegador.PanelPunt.ruta) {
             val context = LocalContext.current
-            CambiadorSonido.repoducirSonido(context, R.raw.abrirPantalla)
+            CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
 
             PantallaPuntuaciones()
         }
@@ -69,7 +69,7 @@ fun AppNavegacion() {
         // Parte para la pantalla donde saldran los records
         composable(Navegador.Records.ruta) {
             val context = LocalContext.current
-            CambiadorSonido.repoducirSonido(context, R.raw.abrirPantalla)
+            CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
             PantallaRecords()
         }
 
@@ -88,7 +88,7 @@ fun AppNavegacion() {
         // Parte para la pantalla de los ajustes
         composable(Navegador.Ajustes.ruta) {
             val context = LocalContext.current
-            CambiadorSonido.repoducirSonido(context, R.raw.abrirPantalla)
+            CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
 
             PantallaAjustes(
                 onIdiomaChange = { idioma ->
@@ -107,7 +107,7 @@ fun AppNavegacion() {
         // Parte para la pantalla de "Sobre"
         composable(Navegador.Sobre.ruta) {
             val context = LocalContext.current
-            CambiadorSonido.repoducirSonido(context, R.raw.abrirPantalla)
+            CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
 
             PantallaSobre(
                 onVolver = {
