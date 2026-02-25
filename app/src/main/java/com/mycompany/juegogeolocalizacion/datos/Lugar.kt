@@ -6,6 +6,7 @@ data class Lugar(
     val ciudad: String,
     val descripcion: String,
     val imagen: Int,
+    val video: Int,
     val latitud: Double,
     val longitud: Double
 )

@@ -6,6 +6,26 @@
     <string name="medio">Medium</string>
     <string name="dificil">Difficult</string>
     <string name="selecciona_lugar">Select a place</string>
-    <string name="intentos_res">"Remaining attempts: "</string>
+    <string name="intentos_res">"Remaining attempts "</string>
     <string name="ayuda">AI assistance</string>
+    <string name="puntuacion">Score</string>
+    <string name="puntuacionT">Total score</string>
+    <string name="acertado">Correct</string>
+    <string name="fallado">Failed</string>
+    <string name="tiempo">Time</string>
+    <string name="records">Records</string>
+    <string name="fecha">Date</string>
+    <string name="tiempoT">Ttotal time</string>
+    <string name="aciertos">Hits</string>
+    <string name="volver">Return</string>
+    <string name="ajustes">Settings</string>
+    <string name="sonido">Sound</string>
+    <string name="idioma">Language</string>
+    <string name="espaniol">Spanish</string>
+    <string name="ingles">English</string>
+    <string name="sobre">About the app</string>
+    <string name="titulo">Where am I?</string>
+    <string name="desarrolladores">Developed by: Belén Candelas Sánchez-Carnerero and Samuel Quintano Molina</string>
+    <string name="descripcion">This app is an educational geolocation game. The user must guess the location of different places from an image, using an interactive map. It includes difficulty levels, scores, records, and explanatory videos.</string>
+    <string name="version">Version 1.0</string>
 </resources>

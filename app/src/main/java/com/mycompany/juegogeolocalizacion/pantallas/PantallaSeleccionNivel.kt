@@ -25,6 +25,7 @@ fun PantallaSeleccionNivel(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment  = Alignment.CenterHorizontally
     ) {
+        // Titulo
         Text(
             text = stringResource(R.string.selecciona_nivel),
             style = MaterialTheme.typography.headlineMedium
@@ -32,6 +33,7 @@ fun PantallaSeleccionNivel(
 
         Spacer(modifier = Modifier.height(21.dp))
 
+        // Boton para seleccionar el tipo de juego facil
         Button(
             onClick = { onSeleccionado(1) },
             modifier = Modifier.fillMaxSize()
@@ -41,6 +43,7 @@ fun PantallaSeleccionNivel(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Boton para seleccionar el tipo de juego medio
         Button(
             onClick = { onSeleccionado(2) },
             modifier = Modifier.fillMaxSize()
@@ -50,6 +53,7 @@ fun PantallaSeleccionNivel(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Boton para seleccionar el tipo de juego dificil
         Button(
             onClick = { onSeleccionado(3) },
             modifier = Modifier.fillMaxSize()

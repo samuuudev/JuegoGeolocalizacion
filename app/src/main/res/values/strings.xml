@@ -5,7 +5,27 @@
     <string name="medio">Medio</string>
     <string name="dificil">Díficil</string>
     <string name="selecciona_lugar">Elige un lugar</string>
-    <string name="intentos_res">"Intentos restantes: "</string>
+    <string name="intentos_res">Intentos restantes</string>
     <string name="ayuda">Ayuda con IA</string>
+    <string name="puntuacionT">Puntuación total</string>
+    <string name="acertado">Acertado</string>
+    <string name="fallado">Fallado</string>
+    <string name="puntuacion">Puntuación</string>
+    <string name="tiempo">Tiempo</string>
+    <string name="records">Récords</string>
+    <string name="fecha">Fecha</string>
+    <string name="tiempoT">Tiempo total</string>
+    <string name="aciertos">Aciertos</string>
+    <string name="volver">Volver</string>
+    <string name="ajustes">Ajustes</string>
+    <string name="sonido">Sonido</string>
+    <string name="idioma">Idioma</string>
+    <string name="espaniol">Español</string>
+    <string name="ingles">Inglés</string>
+    <string name="sobre">Sobre la app</string>
+    <string name="titulo">¿Donde estoy?</string>
+    <string name="desarrolladores">Desarrollado por: Belén Candelas Sánchez-Carnerero y Samuel Quintano Molina</string>
+    <string name="descripcion">Esta app es un juego educativo de geolocalización. El usuario debe adivinar la ubicación de diferentes lugares a partir de una imagen, usando un mapa interactivo. Incluye niveles de dificultad, puntuaciones, récords y videos explicativos</string>
+    <string name="version">Versión: 1.0</string>
 
 </resources>
