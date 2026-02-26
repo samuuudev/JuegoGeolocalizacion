@@ -1,5 +1,6 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -37,7 +39,19 @@ val resultadosEjemplo = listOf(
 fun PantallaPuntuaciones(
     resultados: List<ResultadosLugar> = resultadosEjemplo
 ) {
+    DisposableEffect(Unit) {
+        Log.d("PantallaPuntuaciones", "Pantalla cargada")
+        Log.d("PantallaPuntuaciones", "Total de resultados: ${resultados.size}")
+        resultados.forEach { resultado ->
+            Log.d("PantallaPuntuaciones", "  ${resultado.nombre}: ${resultado.puntuacion} pts, Tiempo=${resultado.tiempoSegundos}s, Acertado=${resultado.acertado}")
+        }
+        onDispose {
+            Log.d("PantallaPuntuaciones", "Pantalla destruida")
+        }
+    }
+
     val puntuacion = resultados.sumOf { it.puntuacion }
+    Log.d("PantallaPuntuaciones", "Puntuación total calculada: $puntuacion")
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)

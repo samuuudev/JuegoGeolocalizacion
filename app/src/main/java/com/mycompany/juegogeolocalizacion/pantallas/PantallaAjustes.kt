@@ -1,5 +1,6 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +30,13 @@ fun PantallaAjustes(
     onIdiomaChange: (String) -> Unit = {},
     onVolver: () -> Unit = {}
 ){
+    DisposableEffect(Unit) {
+        Log.d("PantallaAjustes", "Pantalla cargada")
+        onDispose {
+            Log.d("PantallaAjustes", "Pantalla destruida")
+        }
+    }
+
     var sonidoActivado by remember { mutableStateOf(true) }
     var idioma by remember { mutableStateOf("ES") }
 
@@ -49,6 +58,7 @@ fun PantallaAjustes(
             Switch(
                 checked = sonidoActivado,
                 onCheckedChange = {
+                    Log.d("PantallaAjustes", "Cambio sonido: $sonidoActivado -> $it")
                     sonidoActivado = it
                     CambiadorSonido.setSonidoActivado(it)
                 }
@@ -62,35 +72,40 @@ fun PantallaAjustes(
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
                     onClick = {
-                        idioma = "es"
+                        Log.d("PantallaAjustes", "Cambiando idioma a: ES")
+                        idioma = "ES"
                         onIdiomaChange("es")
                     }
                 ) {
-                    Text(stringResource(R.string.espaniol))
+                    Text("Español")
                 }
 
                 Button(
                     onClick = {
-                        idioma = "en"
+                        Log.d("PantallaAjustes", "Cambiando idioma a: EN")
+                        idioma = "EN"
                         onIdiomaChange("en")
                     }
                 ) {
-                    Text(stringResource(R.string.ingles))
+                    Text("English")
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
 
-            Button(
-                onClick = onVolver,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.volver))
-            }
+        Button(
+            onClick = {
+                Log.d("PantallaAjustes", "Usuario presionó Volver")
+                onVolver()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.volver))
         }
     }
 }

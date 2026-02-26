@@ -1,5 +1,6 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,6 +36,17 @@ val recordsEjemplo = listOf(
 fun PantallaRecords(
     records: List<RecordPartida> = recordsEjemplo
 ) {
+    DisposableEffect(Unit) {
+        Log.d("PantallaRecords", "Pantalla cargada")
+        Log.d("PantallaRecords", "Total de records: ${records.size}")
+        records.forEachIndexed { index, record ->
+            Log.d("PantallaRecords", "  [$index] Fecha=${record.fecha}, Puntos=${record.puntuacionTotal}, Tiempo=${record.tiempoTotalSegundos}s, Aciertos=${record.aciertos}")
+        }
+        onDispose {
+            Log.d("PantallaRecords", "Pantalla destruida")
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
     ) {

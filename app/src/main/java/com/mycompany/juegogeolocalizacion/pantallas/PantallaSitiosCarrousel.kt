@@ -1,5 +1,6 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -29,6 +31,16 @@ fun PantallaSitiosCarrousel(
     sitios: List<Lugar> = ImagenesSitios,
     onSeleccionado: (Int) -> Unit
 ) {
+    DisposableEffect(Unit) {
+        Log.d("PantallaSitiosCarrousel", "Pantalla cargada - ${sitios.size} sitios disponibles")
+        sitios.forEachIndexed { index, sitio ->
+            Log.d("PantallaSitiosCarrousel", "  [$index] ID=${sitio.id}, Nombre=${sitio.nombre}")
+        }
+        onDispose {
+            Log.d("PantallaSitiosCarrousel", "Pantalla destruida")
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -45,7 +57,10 @@ fun PantallaSitiosCarrousel(
         ) {
             items(sitios) { sitio ->
                 Card(
-                    modifier = Modifier.width(250.dp).clickable { onSeleccionado(sitio.id) }
+                    modifier = Modifier.width(250.dp).clickable {
+                        Log.d("PantallaSitiosCarrousel", "Usuario seleccionó sitio: ID=${sitio.id}, Nombre=${sitio.nombre}")
+                        onSeleccionado(sitio.id)
+                    }
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally

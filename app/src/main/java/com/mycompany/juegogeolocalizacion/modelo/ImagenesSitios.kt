@@ -1,5 +1,6 @@
 package com.mycompany.juegogeolocalizacion.modelo
 
+import android.util.Log
 import com.mycompany.juegogeolocalizacion.R
 import com.mycompany.juegogeolocalizacion.datos.Lugar
 
@@ -38,7 +39,7 @@ val ImagenesSitios = listOf(
     ),
 
     Lugar(
-        id = 1,
+        id = 4,
         nombre = "Plaza Mayor",
         ciudad = "Madrid",
         descripcion = "Amplio espacio público rodeado de edificios históricos, utilizado tradicionalmente para reuniones y celebraciones",
@@ -49,13 +50,18 @@ val ImagenesSitios = listOf(
     ),
 
     Lugar(
-        id = 1,
+        id = 5,
         nombre = "Cristo Redentor",
         ciudad = "Río de Janeiro",
         descripcion = "Imponente estatua de gran altura situada en lo alto de una montaña, con los brazos extendidos en gesto de bienvenida",
-        imagen = R.drawable.torre,
+        imagen = R.drawable.cristo,
         video = 0,
         latitud = -22.9519,
         longitud = -43.2105
     )
-)
+).also {
+    Log.d("ImagenesSitios", "Lista de sitios inicializada con ${it.size} lugares")
+    it.forEach { lugar ->
+        Log.d("ImagenesSitios", "  ID=${lugar.id}: ${lugar.nombre} (${lugar.ciudad}) - Lat=${lugar.latitud}, Lon=${lugar.longitud}")
+    }
+}
