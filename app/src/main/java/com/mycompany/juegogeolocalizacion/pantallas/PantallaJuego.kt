@@ -2,6 +2,7 @@ package com.mycompany.juegogeolocalizacion.pantallas
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import com.mycompany.juegogeolocalizacion.datos.PuntuacionesRepo.guardarPuntuaci
 import com.mycompany.juegogeolocalizacion.navegacion.Navegador
 import kotlinx.coroutines.delay
 import kotlin.math.*
+import java.util.Locale
 
 @Composable
 fun PantallaJuego(
@@ -83,9 +85,15 @@ fun PantallaJuego(
     var intentos by remember { mutableStateOf(nivel.intentos) }
     var aciertos by remember { mutableStateOf(0) }
     var tiempo by remember { mutableStateOf(0) }
-    var mostrarDialogo by remember { mutableStateOf(false) }
-    var mensajeDialogo by remember { mutableStateOf("") }
+    var mensajeEmergente by remember { mutableStateOf("") }
+    var mostrarMensajeEmergente by remember { mutableStateOf(false) }
+    var mostrarDialogoFinal by remember { mutableStateOf(false) }
+    var mensajeDialogoFinal by remember { mutableStateOf("") }
     val context = LocalContext.current
+
+    // Estado para mostrar la línea entre selección y objetivo SOLO al final
+    var ultimaSeleccion by remember { mutableStateOf<Pair<Double, Double>?>(null) }
+    var ultimaDistancia by remember { mutableStateOf<Double?>(null) }
 
     DisposableEffect(Unit) {
         Log.d("PantallaJuego", "Composable montado - Iniciando temporizador")
@@ -138,33 +146,69 @@ fun PantallaJuego(
             modifier = Modifier.fillMaxWidth().weight(1f),
             contentAlignment = Alignment.Center
         ) {
+            // Mensaje emergente en la parte superior del mapa
+            if (mostrarMensajeEmergente) {
+                LaunchedEffect(Unit) {
+                    delay(2000)
+                    mostrarMensajeEmergente = false
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .align(Alignment.TopCenter),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = mensajeEmergente,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier
+                            .background(
+                                color = if (mensajeEmergente.startsWith("✓"))
+                                    MaterialTheme.colorScheme.primaryContainer
+                                else
+                                    MaterialTheme.colorScheme.errorContainer,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                            )
+                            .padding(12.dp)
+                    )
+                }
+            }
+
             MapOSM(
                 sitio = sitio,
-                onMapTap = { latTap, lonTap ->
-                    Log.d("PantallaJuego", "Tap en mapa: lat=$latTap, lon=$lonTap")
+                targetPoint = if (ultimaSeleccion != null) Pair(sitio.latitud, sitio.longitud) else null,
+                distanciaKm = ultimaDistancia,
+                onSelectionConfirmed = { latSel, lonSel, radiusKm ->
+                    Log.d("PantallaJuego", "Selección confirmada: lat=$latSel, lon=$lonSel, radioKm=$radiusKm")
                     CambiadorSonido.repoducirSonido(context, R.raw.tocar_mapa)
 
                     if (intentos <= 0) {
-                        Log.w("PantallaJuego", "No quedan intentos - Tap ignorado")
+                        Log.w("PantallaJuego", "No quedan intentos - Selección ignorada")
                         return@MapOSM
                     }
 
                     val distancia = calcularDistanciaKm(
-                        latTap, lonTap,
+                        latSel, lonSel,
                         sitio.latitud, sitio.longitud
                     )
                     Log.d("PantallaJuego", "Distancia calculada: ${"%.2f".format(distancia)} km")
 
-                    val radioKm = when(nivel.id) {
-                        1 -> 50.0
-                        2 -> 25.0
-                        3 -> 10.0
+                    // Radio fijo por nivel
+                    val radioNivel = when (nivel.id) {
+                        1 -> 50.0  // Nivel Fácil: 50 km
+                        2 -> 25.0  // Nivel Medio: 25 km
+                        3 -> 10.0  // Nivel Difícil: 10 km
                         else -> 25.0
                     }
-                    Log.d("PantallaJuego", "Radio del nivel: $radioKm km")
+                    Log.d("PantallaJuego", "Radio del nivel (${nivel.nombre}): $radioNivel km")
 
-                    if (distancia <= radioKm) {
-                        Log.i("PantallaJuego", "¡ACIERTO! Distancia dentro del radio")
+                    // Decidir acierto usando el radio FIJO del nivel
+                    val esAcierto = distancia <= radioNivel
+                    if (esAcierto) {
+                        Log.i("PantallaJuego", "¡ACIERTO! Distancia dentro del radio del nivel")
                         aciertos++
                         val base = 1000
                         val intentosUsados = nivel.intentos - intentos + 1
@@ -172,21 +216,43 @@ fun PantallaJuego(
                         puntuacion += puntosGanados
                         Log.d("PantallaJuego", "Puntos ganados: $puntosGanados (Total: $puntuacion)")
 
-                        mensajeDialogo = "¡Acertaste! +$puntosGanados puntos\nDistancia: ${"%.1f".format(distancia)} km"
-                        mostrarDialogo = true
+                        // Mostrar mensaje emergente corto
+                        mensajeEmergente = "¡Acertaste! +$puntosGanados puntos"
+                        mostrarMensajeEmergente = true
+
+                        Log.i("PantallaJuego", "¡ACIERTO! Terminando juego inmediatamente")
+                        intentos = 0
                     } else {
-                        Log.i("PantallaJuego", "FALLO - Distancia fuera del radio")
-                        val direccion = obtenerDireccion(latTap, lonTap, sitio.latitud, sitio.longitud)
-                        Log.d("PantallaJuego", "Dirección correcta: $direccion")
-                        mensajeDialogo = "Fallaste. Está más al $direccion\nDistancia: ${"%.1f".format(distancia)} km"
-                        mostrarDialogo = true
+                        Log.i("PantallaJuego", "FALLO - Distancia fuera del radio del nivel")
+                        val direccion = obtenerDireccion(latSel, lonSel, sitio.latitud, sitio.longitud)
+                        Log.d("PantallaJuego", "Dirección sugerida: $direccion")
+
+                        // Mostrar mensaje emergente corto
+                        mensajeEmergente = "Fallaste. Está más al $direccion"
+                        mostrarMensajeEmergente = true
+
+                        intentos--
                     }
 
-                    intentos--
                     Log.d("PantallaJuego", "Intentos restantes: $intentos")
 
+                    // Si se agotaron los intentos, mostrar diálogo final con línea y localización
                     if (intentos == 0) {
-                        Log.i("PantallaJuego", "Juego terminado - Guardando puntuación")
+                        Log.i("PantallaJuego", "Juego terminado - Preparando diálogo final")
+
+                        // Guardar selección y distancia SOLO para mostrar en diálogo final
+                        ultimaSeleccion = Pair(latSel, lonSel)
+                        ultimaDistancia = distancia
+
+                        // Preparar mensaje final detallado
+                        val distanciaStr = String.format(Locale.getDefault(), "%.2f", distancia)
+                        mensajeDialogoFinal = "Tu ubicación: (${String.format(Locale.getDefault(), "%.4f", latSel)}, ${String.format(Locale.getDefault(), "%.4f", lonSel)})\n" +
+                                "Ubicación real: (${String.format(Locale.getDefault(), "%.4f", sitio.latitud)}, ${String.format(Locale.getDefault(), "%.4f", sitio.longitud)})\n\n" +
+                                "Distancia: $distanciaStr km\n\n" +
+                                "Aciertos: $aciertos / ${nivel.intentos}\n" +
+                                "Puntuación total: $puntuacion puntos"
+                        mostrarDialogoFinal = true
+
                         Log.d("PantallaJuego", "Resultados finales: Puntos=$puntuacion, Tiempo=${tiempo}s, Aciertos=$aciertos")
 
                         guardarPuntuacion(
@@ -197,22 +263,34 @@ fun PantallaJuego(
                                 aciertos = aciertos
                             )
                         )
-                        Log.d("PantallaJuego", "Navegando a pantalla de puntuaciones")
-                        navController.navigate(Navegador.PanelPunt.ruta)
+                        Log.d("PantallaJuego", "Puntuación guardada - Esperando a que el usuario continúe")
                     }
                 }
             )
         }
     }
 
-    if (mostrarDialogo) {
+    if (mostrarDialogoFinal) {
         AlertDialog(
-            onDismissRequest = { mostrarDialogo = false },
-            title = { Text(if (aciertos > 0) "¡Correcto!" else "Intenta de nuevo") },
-            text = { Text(mensajeDialogo) },
+            onDismissRequest = {
+                Log.d("PantallaJuego", "Diálogo final cerrado por el usuario - esperando acción")
+            },
+            title = { Text("Resultado final") },
+            text = { Text(mensajeDialogoFinal) },
             confirmButton = {
-                Button(onClick = { mostrarDialogo = false }) {
-                    Text("OK")
+                Button(onClick = {
+                    Log.d("PantallaJuego", "Usuario presionó 'Siguiente' - Navegando a panel de puntuaciones")
+                    navController.navigate(Navegador.PanelPunt.ruta)
+                }) {
+                    Text("Siguiente")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    Log.d("PantallaJuego", "Usuario cerró el diálogo - Continúa explorando el mapa")
+                    mostrarDialogoFinal = false
+                }) {
+                    Text("Explorar mapa")
                 }
             }
         )

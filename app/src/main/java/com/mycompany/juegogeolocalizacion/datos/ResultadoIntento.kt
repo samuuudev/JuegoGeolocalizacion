@@ -6,5 +6,3 @@ data class ResultadoIntento(
     val distanciaKm: Double,
     val direccion: Direccion
 )
-
-enum class Direccion { NORTE, SUR, ESTE, OESTE}
