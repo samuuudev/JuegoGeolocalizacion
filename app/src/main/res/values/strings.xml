@@ -27,5 +27,13 @@
     <string name="desarrolladores">Desarrollado por: Belén Candelas Sánchez-Carnerero y Samuel Quintano Molina</string>
     <string name="descripcion">Esta app es un juego educativo de geolocalización. El usuario debe adivinar la ubicación de diferentes lugares a partir de una imagen, usando un mapa interactivo. Incluye niveles de dificultad, puntuaciones, récords y videos explicativos</string>
     <string name="version">Versión: 1.0</string>
+    <string name="conexion">Conéctate a una red con acceso a internet para cargar el mapa</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="segundos">segundos</string>
+    <string name="explorarMapa">Explorar mapa</string>
+    <string name="resultadoFinal">Resultado final</string>
+    <string name="errorNivel">Error: No se ha seleccionado ningún nivel</string>
+    <string name="errorSitio">Error: No se encontró el sitio con ID</string>
 
 </resources>

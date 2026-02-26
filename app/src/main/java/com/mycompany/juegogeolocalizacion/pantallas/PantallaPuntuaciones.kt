@@ -106,8 +106,8 @@ fun PantallaPuntuaciones(
                                     }
                             )
 
-                            Text("${R.string.tiempo}: ${res.tiempoSegundos} segundos")
-                            Text("${R.string.puntuacion}: ${res.tiempoSegundos} segundos")
+                            Text("${R.string.tiempo}: ${res.tiempoSegundos} ${R.string.segundos}")
+                            Text("${R.string.puntuacion}: ${res.tiempoSegundos} ${R.string.segundos}")
                         }
                     }
                 }

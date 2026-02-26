@@ -81,7 +81,7 @@ fun PantallaAjustes(
                         onIdiomaChange("es")
                     }
                 ) {
-                    Text("Español")
+                    Text(stringResource(R.string.espaniol))
                 }
 
                 Button(
@@ -91,7 +91,7 @@ fun PantallaAjustes(
                         onIdiomaChange("en")
                     }
                 ) {
-                    Text("English")
+                    Text(stringResource(R.string.ingles))
                 }
             }
         }

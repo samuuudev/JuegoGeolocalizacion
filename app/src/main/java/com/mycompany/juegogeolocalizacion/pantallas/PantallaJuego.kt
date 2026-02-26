@@ -52,10 +52,13 @@ fun PantallaJuego(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Error: No se encontró el sitio con ID $idSitio", color = MaterialTheme.colorScheme.error)
+            Text(
+                text = "${stringResource(R.string.errorSitio)} $idSitio",
+                color = MaterialTheme.colorScheme.error
+            )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = { navController.popBackStack() }) {
-                Text("Volver")
+                Text(stringResource(R.string.volver))
             }
         }
         return
@@ -68,10 +71,13 @@ fun PantallaJuego(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Error: No se ha seleccionado ningún nivel", color = MaterialTheme.colorScheme.error)
+            Text(
+                text = stringResource(R.string.errorNivel),
+                color = MaterialTheme.colorScheme.error
+            )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = { navController.popBackStack() }) {
-                Text("Volver")
+                Text(stringResource(R.string.volver))
             }
         }
         return
@@ -275,7 +281,7 @@ fun PantallaJuego(
             onDismissRequest = {
                 Log.d("PantallaJuego", "Diálogo final cerrado por el usuario - esperando acción")
             },
-            title = { Text("Resultado final") },
+            title = { Text(stringResource(R.string.resultadoFinal)) },
             text = { Text(mensajeDialogoFinal) },
             confirmButton = {
                 Button(onClick = {
@@ -290,7 +296,7 @@ fun PantallaJuego(
                     Log.d("PantallaJuego", "Usuario cerró el diálogo - Continúa explorando el mapa")
                     mostrarDialogoFinal = false
                 }) {
-                    Text("Explorar mapa")
+                    Text(stringResource(R.string.explorarMapa))
                 }
             }
         )

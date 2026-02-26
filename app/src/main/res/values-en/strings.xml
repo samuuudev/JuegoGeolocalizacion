@@ -28,4 +28,12 @@
     <string name="desarrolladores">Developed by: Belén Candelas Sánchez-Carnerero and Samuel Quintano Molina</string>
     <string name="descripcion">This app is an educational geolocation game. The user must guess the location of different places from an image, using an interactive map. It includes difficulty levels, scores, records, and explanatory videos.</string>
     <string name="version">Version 1.0</string>
+    <string name="conexion">Connect to a network with internet access to load the map</string>
+    <string name="cancelar">Cancel</string>
+    <string name="confirmar">Confirm</string>
+    <string name="segundos">seconds</string>
+    <string name="explorarMapa">Explore map</string>
+    <string name="resultadoFinal">Final result</string>
+    <string name="errorNivel">Error: No level has been selected</string>
+    <string name="errorSitio">Error: Site not found with ID</string>
 </resources>

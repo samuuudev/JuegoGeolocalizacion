@@ -25,8 +25,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.mycompany.juegogeolocalizacion.R
 import com.mycompany.juegogeolocalizacion.datos.Lugar
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -67,7 +69,7 @@ fun MapOSM(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Conéctate a una red con acceso a internet para cargar el mapa.",
+                text = stringResource(R.string.conexion),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -259,7 +261,7 @@ fun MapOSM(
                         Log.d("MapOSM", "Selección cancelada")
                         selectedPoint = null
                     }) {
-                        Text("Cancelar")
+                        Text(stringResource(R.string.cancelar))
                     }
 
                     Button(onClick = {
@@ -268,7 +270,7 @@ fun MapOSM(
                         Log.d("MapOSM", "Confirm selection invoked: lat=$sLat lon=$sLon radiusKm=$radiusKm")
                         onSelectionConfirmed?.invoke(sLat, sLon, radiusKm)
                     }) {
-                        Text("Confirmar")
+                        Text(stringResource(R.string.confirmar))
                     }
                 }
             }
