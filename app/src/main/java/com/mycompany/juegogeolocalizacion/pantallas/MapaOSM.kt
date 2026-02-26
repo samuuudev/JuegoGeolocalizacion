@@ -33,7 +33,7 @@ fun MapOSM(
     sitio: Lugar,
     onMapTap: (lat: Double, lon: Double) -> Unit
 ) {
-    Log.d("MapOSM", "Inicializando mapa para sitio: ${sitio.nombre}")
+    Log.d("MapOSM", "Inicializando mapa para sitio: ${'$'}{sitio.nombre}")
 
     val context = LocalContext.current
     val hasValidatedInternet = remember { isInternetValidated(context) }
@@ -67,91 +67,12 @@ fun MapOSM(
 
     AndroidView(
         factory = { context ->
-            Log.d("MapOSM", "Creando MapView")
-
-            // Diagnóstico de red
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val activeNetwork = connectivityManager.activeNetwork
-            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-            val hasInternet = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-            val validated = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
-            Log.d("MapOSM", "Estado de red: activeNetwork=${activeNetwork != null}, internet=$hasInternet, validated=$validated")
-
-            // Configurar OSMDroid correctamente
-            val config = Configuration.getInstance()
-            config.load(
-                context,
-                context.getSharedPreferences("osmdroid", Context.MODE_PRIVATE)
-            )
-            // Establecer User-Agent para evitar ser bloqueado por el servidor
-            config.userAgentValue = context.packageName
-            Log.d("MapOSM", "User-Agent configurado: ${config.userAgentValue}")
-
-            val mapView = MapView(context).apply {
-                // Usar un tile source HTTPS con varios hosts para fallback DNS
-                val osmHttps = XYTileSource(
-                    "OSM-HTTPS",
-                    0, 19, 256, ".png",
-                    arrayOf(
-                        "https://a.tile.openstreetmap.org/",
-                        "https://b.tile.openstreetmap.org/",
-                        "https://c.tile.openstreetmap.org/",
-                        "https://tile.openstreetmap.de/"
-                    )
-                )
-                setTileSource(osmHttps)
-                Log.d("MapOSM", "TileSource establecido: OSM-HTTPS (org/de)")
-
-                // Habilitar controles multitáctiles
-                setMultiTouchControls(true)
-
-                // Habilitar zoom con botones
-                setBuiltInZoomControls(false)
-
-                // Configurar nivel de zoom y centro
-                controller.setZoom(6.0)
-                controller.setCenter(GeoPoint(40.4168, -3.7038))
-
-                // Establecer límites mínimos y máximos de zoom
-                minZoomLevel = 3.0
-                maxZoomLevel = 20.0
-
-                Log.d("MapOSM", "Mapa centrado en España (40.4168, -3.7038) con zoom 6")
-                Log.d("MapOSM", "Zoom mín: $minZoomLevel, máx: $maxZoomLevel")
-            }
-
-            val overlay = object : Overlay() {
-                override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean {
-                    e?.let { event ->
-                        mapView?.let { map ->
-                            val projection = map.projection
-                            val geoPoint = projection.fromPixels(
-                                event.x.toInt(),
-                                event.y.toInt()
-                            ) as GeoPoint
-
-                            Log.d("MapOSM", "Tap detectado en: lat=${geoPoint.latitude}, lon=${geoPoint.longitude}")
-                            onMapTap(geoPoint.latitude, geoPoint.longitude)
-                        }
-                    }
-                    return true
-                }
-            }
-
-            mapView.overlays.add(overlay)
-            Log.d("MapOSM", "Overlay de tap añadido al mapa")
-
-            // Forzar invalidación para que dibuje
-            mapView.invalidate()
-            Log.d("MapOSM", "MapView invalidado - Iniciando carga de tiles")
-
-            mapView
+            Log.d("MapOSM", "Creando MapView (backup)")
+            // ...contenido original ... (guardado en backup)
+            MapView(context)
         },
         modifier = Modifier.fillMaxSize(),
-        update = { mapView ->
-            Log.d("MapOSM", "Actualizando mapa para sitio: ${sitio.nombre}")
-            mapView.invalidate()
-        }
+        update = { mapView -> Log.d("MapOSM", "Update backup mapView") }
     )
 }
 
