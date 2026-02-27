@@ -1,15 +1,14 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -17,101 +16,151 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.mycompany.juegogeolocalizacion.R
+import com.mycompany.juegogeolocalizacion.datos.PuntuacionesRepo
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-data class ResultadosLugar(
-    val id: Int,
-    val nombre: String,
-    val imagen: Int,
-    val tiempoSegundos: Int,
-    val puntuacion: Int,
-    val acertado: Boolean
-)
-val resultadosEjemplo = listOf(
-    ResultadosLugar(1, "Plaza Mayor", R.drawable.plaza, 32, 70, true),
-    ResultadosLugar(2, "La Giralda", R.drawable.coliseo, 55, 30, false) )
 @Composable
-fun PantallaPuntuaciones(
-    resultados: List<ResultadosLugar> = resultadosEjemplo
-) {
+fun PantallaPuntuaciones() {
+    Log.d("PantallaPuntuaciones", "Pantalla cargada")
+
     DisposableEffect(Unit) {
-        Log.d("PantallaPuntuaciones", "Pantalla cargada")
-        Log.d("PantallaPuntuaciones", "Total de resultados: ${resultados.size}")
-        resultados.forEach { resultado ->
-            Log.d("PantallaPuntuaciones", "  ${resultado.nombre}: ${resultado.puntuacion} pts, Tiempo=${resultado.tiempoSegundos}s, Acertado=${resultado.acertado}")
-        }
+        Log.d("PantallaPuntuaciones", "PantallaPuntuaciones montada")
         onDispose {
-            Log.d("PantallaPuntuaciones", "Pantalla destruida")
+            Log.d("PantallaPuntuaciones", "PantallaPuntuaciones desmontada")
         }
     }
 
-    val puntuacion = resultados.sumOf { it.puntuacion }
-    Log.d("PantallaPuntuaciones", "Puntuación total calculada: $puntuacion")
+    // Obtener la última puntuación guardada
+    val ultimaPuntuacion = remember {
+        val puntuaciones = PuntuacionesRepo.obtenerPuntuaciones()
+        Log.d("PantallaPuntuaciones", "Total de puntuaciones guardadas: ${puntuaciones.size}")
+        if (puntuaciones.isNotEmpty()) {
+            puntuaciones.last().also {
+                Log.d("PantallaPuntuaciones", "Última puntuación: ${it.puntuacionT} pts, Aciertos: ${it.aciertos}")
+            }
+        } else {
+            null
+        }
+    }
+
+    if (ultimaPuntuacion == null) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("No hay puntuaciones registradas", style = MaterialTheme.typography.titleMedium)
+        }
+        return
+    }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        // Puntuacion total
+        // Título
         Text(
-            text = ("${R.string.puntuacionT}: ${puntuacion}"),
-            style = MaterialTheme.typography.headlineMedium
+            text = "Resultados de la partida",
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(21.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Lista con los resultados
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        // Resumen general
+        Card(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            items(resultados) { res ->
-                Card(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = res.imagen),
-                            contentDescription = res.nombre,
-                            modifier = Modifier.height(80.dp)
-                        )
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Puntuación total:", fontWeight = FontWeight.Bold)
+                    Text("${ultimaPuntuacion.puntuacionT} puntos", style = MaterialTheme.typography.titleMedium)
+                }
 
-                        Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                        Column {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Total aciertos:", fontWeight = FontWeight.Bold)
+                    Text("${ultimaPuntuacion.aciertos}", style = MaterialTheme.typography.titleMedium)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Tiempo total:", fontWeight = FontWeight.Bold)
+                    Text("${ultimaPuntuacion.tiempoT} segundos", style = MaterialTheme.typography.titleMedium)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Fecha:", fontWeight = FontWeight.Bold)
+                    val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val fecha = try {
+                        formatter.format(Date(ultimaPuntuacion.fecha.toLong()))
+                    } catch (_: Exception) {
+                        ultimaPuntuacion.fecha
+                    }
+                    Text(fecha, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Historial de aciertos
+        if (ultimaPuntuacion.historialAciertos.isNotEmpty()) {
+            Text(
+                text = "Detalle de aciertos:",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(ultimaPuntuacion.historialAciertos) { acierto ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(12.dp)) {
                             Text(
-                                text = res.nombre,
-                                style = MaterialTheme.typography.titleMedium
+                                text = acierto.nombreSitio,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
                             )
 
-                            Text(
-                                text =
-                                    if(res.acertado) {
-                                        stringResource(R.string.acertado)
-                                    } else {
-                                        stringResource(R.string.fallado)
-                                    }
-                                ,
-                                color =
-                                    if(res.acertado) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.error
-                                    }
-                            )
+                            Spacer(modifier = Modifier.height(8.dp))
 
-                            Text("${R.string.tiempo}: ${res.tiempoSegundos} ${R.string.segundos}")
-                            Text("${R.string.puntuacion}: ${res.tiempoSegundos} ${R.string.segundos}")
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Dificultad: ${acierto.dificultad}", style = MaterialTheme.typography.bodySmall)
+                                Text("${acierto.puntos} pts", fontWeight = FontWeight.Bold)
+                            }
+
+                            Spacer(modifier = Modifier.height(4.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Intentos: ${acierto.intentosUsados}", style = MaterialTheme.typography.bodySmall)
+                                Text("Distancia: ${"%.2f".format(acierto.distanciaKm)} km", style = MaterialTheme.typography.bodySmall)
+                            }
                         }
                     }
                 }
             }
+        } else {
+            Text("No hay aciertos registrados", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

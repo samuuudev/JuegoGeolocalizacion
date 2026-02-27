@@ -1,3 +1,8 @@
 package com.mycompany.juegogeolocalizacion.datos
 
-enum class Direccion { NORTE, SUR, ESTE, OESTE }
+enum class Direccion {
+    NORTE,
+    SUR,
+    ESTE,
+    OESTE
+}

@@ -4,5 +4,6 @@ data class Puntuacion(
     val fecha: String,
     val puntuacionT: Int,
     val tiempoT: Int,
-    val aciertos: Int
+    val aciertos: Int,
+    val historialAciertos: List<AciertoDetalle> = emptyList()
 )

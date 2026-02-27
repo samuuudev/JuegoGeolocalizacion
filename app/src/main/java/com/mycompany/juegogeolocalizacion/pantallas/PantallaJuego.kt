@@ -95,6 +95,9 @@ fun PantallaJuego(
     var mostrarMensajeEmergente by remember { mutableStateOf(false) }
     var mostrarDialogoFinal by remember { mutableStateOf(false) }
     var mensajeDialogoFinal by remember { mutableStateOf("") }
+
+    // Lista para registrar detalles de cada acierto
+    var acieertos by remember { mutableStateOf<List<com.mycompany.juegogeolocalizacion.datos.AciertoDetalle>>(emptyList()) }
     val context = LocalContext.current
 
     // Estado para mostrar la línea entre selección y objetivo SOLO al final
@@ -222,8 +225,19 @@ fun PantallaJuego(
                         puntuacion += puntosGanados
                         Log.d("PantallaJuego", "Puntos ganados: $puntosGanados (Total: $puntuacion)")
 
+                        // Registrar detalle del acierto
+                        val detalle = com.mycompany.juegogeolocalizacion.datos.AciertoDetalle(
+                            nombreSitio = sitio.nombre,
+                            dificultad = nivel.nombre,
+                            puntos = puntosGanados,
+                            intentosUsados = intentosUsados,
+                            distanciaKm = distancia
+                        )
+                        acieertos = acieertos + detalle
+                        Log.d("PantallaJuego", "Acierto registrado: ${detalle.nombreSitio} - ${detalle.puntos} puntos")
+
                         // Mostrar mensaje emergente corto
-                        mensajeEmergente = "¡Acertaste! +$puntosGanados puntos"
+                        mensajeEmergente = "✓ ¡Acertaste! +$puntosGanados puntos"
                         mostrarMensajeEmergente = true
 
                         Log.i("PantallaJuego", "¡ACIERTO! Terminando juego inmediatamente")
@@ -234,7 +248,7 @@ fun PantallaJuego(
                         Log.d("PantallaJuego", "Dirección sugerida: $direccion")
 
                         // Mostrar mensaje emergente corto
-                        mensajeEmergente = "Fallaste. Está más al $direccion"
+                        mensajeEmergente = "✗ Fallaste. Está más al $direccion"
                         mostrarMensajeEmergente = true
 
                         intentos--
@@ -250,12 +264,12 @@ fun PantallaJuego(
                         ultimaSeleccion = Pair(latSel, lonSel)
                         ultimaDistancia = distancia
 
-                        // Preparar mensaje final detallado
+                        // Preparar mensaje final simple (solo info del último acierto)
                         val distanciaStr = String.format(Locale.getDefault(), "%.2f", distancia)
+
                         mensajeDialogoFinal = "Tu ubicación: (${String.format(Locale.getDefault(), "%.4f", latSel)}, ${String.format(Locale.getDefault(), "%.4f", lonSel)})\n" +
                                 "Ubicación real: (${String.format(Locale.getDefault(), "%.4f", sitio.latitud)}, ${String.format(Locale.getDefault(), "%.4f", sitio.longitud)})\n\n" +
                                 "Distancia: $distanciaStr km\n\n" +
-                                "Aciertos: $aciertos / ${nivel.intentos}\n" +
                                 "Puntuación total: $puntuacion puntos"
                         mostrarDialogoFinal = true
 
@@ -266,7 +280,8 @@ fun PantallaJuego(
                                 fecha = fecha,
                                 puntuacionT = puntuacion,
                                 tiempoT = tiempo,
-                                aciertos = aciertos
+                                aciertos = aciertos,
+                                historialAciertos = acieertos
                             )
                         )
                         Log.d("PantallaJuego", "Puntuación guardada - Esperando a que el usuario continúe")
