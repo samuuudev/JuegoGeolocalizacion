@@ -64,35 +64,53 @@ fun PantallaSeleccionNivel(
 
             Button(
                 onClick = { onSeleccionado(1) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .width(260.dp)
+                    .height(60.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E7D32),
                     contentColor = Color.White
                 )
             ) {
-                Text(stringResource(R.string.facil))
+                Text(
+                    text = "🟢 ${stringResource(R.string.facil)}",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             Button(
                 onClick = { onSeleccionado(2) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .width(260.dp)
+                    .height(60.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFF9A825),
                     contentColor = Color.White
                 )
             ) {
-                Text(stringResource(R.string.medio))
+                Text(
+                    text = "🟡 ${stringResource(R.string.medio)}",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             Button(
                 onClick = { onSeleccionado(3) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .width(260.dp)
+                    .height(60.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFC62828),
                     contentColor = Color.White
                 )
             ) {
-                Text(stringResource(R.string.dificil))
+                Text(
+                    text = "🔴 ${stringResource(R.string.dificil)}",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }
