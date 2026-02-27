@@ -13,9 +13,8 @@ import java.net.URL
  */
 object OpenAIHelper {
     private val TAG = "OpenAIHelper"
-    // ⚠️ CAMBIAR: Obtén una nueva key de https://platform.openai.com/api-keys
-    // TODO: Mover a BuildConfig o archivo de configuración seguro
-    private const val API_KEY = "TU_NUEVA_API_KEY_AQUI"  // ← Reemplaza con tu nueva key
+
+    private const val API_KEY = "TU_NUEVA_API_KEY_AQUI"  // ← Reemplazar con la api key
     private const val API_URL = "https://api.openai.com/v1/chat/completions"
     private const val MODEL = "gpt-3.5-turbo"
 

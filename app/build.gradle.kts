@@ -16,7 +16,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "OPENAI_API_KEY", "\" -- \"") // Añadir aqui la api
     }
 
     buildTypes {
@@ -37,6 +36,7 @@ android {
     }
     buildFeatures {
         compose = true
+        bui
     }
 }
 
