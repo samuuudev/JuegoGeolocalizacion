@@ -146,9 +146,9 @@ fun PantallaSitiosCarrousel(
                                 modifier = Modifier
                                     .matchParentSize(),
                                 color = if (resultado)
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                 else
-                                    MaterialTheme.colorScheme.error.copy(alpha = 0.35f)
+                                    MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
                             ) {}
                         }
 

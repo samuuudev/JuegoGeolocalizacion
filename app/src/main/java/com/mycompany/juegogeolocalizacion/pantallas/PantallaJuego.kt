@@ -8,14 +8,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.mycompany.juegogeolocalizacion.R
 import com.mycompany.juegogeolocalizacion.datos.EstadoJuego
 import com.mycompany.juegogeolocalizacion.modelo.ImagenesSitios
 import com.mycompany.juegogeolocalizacion.datos.NivelActual
 import com.mycompany.juegogeolocalizacion.datos.Puntuacion
 import com.mycompany.juegogeolocalizacion.datos.PuntuacionesRepo
-import com.mycompany.juegogeolocalizacion.navegacion.Navegador
 import kotlinx.coroutines.delay
 import kotlin.math.*
 
@@ -31,9 +32,7 @@ fun PantallaJuego(
 
     if (sitio == null || nivel == null) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
+            modifier = Modifier.fillMaxSize().padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -46,24 +45,39 @@ fun PantallaJuego(
         return
     }
 
+    // Detectar si ya fue jugado
+    val yaJugado = EstadoJuego.resultadoSitio.containsKey(sitio.id)
+    val seleccionGuardada = EstadoJuego.seleccionJugador[sitio.id]
+
     var puntuacion by remember { mutableStateOf(0) }
     var intentos by remember { mutableStateOf(nivel.intentos) }
     var aciertos by remember { mutableStateOf(0) }
     var tiempo by remember { mutableStateOf(0) }
 
-    var mostrarDialogoAI by remember { mutableStateOf(false) }
-    var pistasAI by remember { mutableStateOf<com.mycompany.juegogeolocalizacion.datos.AIPistas?>(null) }
-    var cargandoAI by remember { mutableStateOf(false) }
-    var errorAI by remember { mutableStateOf<String?>(null) }
-    var ayudasUsadas by remember { mutableStateOf(0) }
-
     var ultimaSeleccion by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var ultimaDistancia by remember { mutableStateOf<Double?>(null) }
 
+    // Timer solo si no está jugado
     LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000)
-            tiempo++
+        if (!yaJugado) {
+            while (true) {
+                delay(1000)
+                tiempo++
+            }
+        }
+    }
+
+    // Si ya estaba jugado, cargar datos guardados
+    LaunchedEffect(yaJugado) {
+        if (yaJugado && seleccionGuardada != null) {
+            ultimaSeleccion = seleccionGuardada
+            ultimaDistancia = calcularDistanciaKm(
+                seleccionGuardada.first,
+                seleccionGuardada.second,
+                sitio.latitud,
+                sitio.longitud
+            )
+            intentos = 0
         }
     }
 
@@ -71,11 +85,11 @@ fun PantallaJuego(
 
         MapOSM(
             sitio = sitio,
-            targetPoint = if (ultimaSeleccion != null)
+            targetPoint = if (intentos == 0 && ultimaSeleccion != null)
                 Pair(sitio.latitud, sitio.longitud)
             else null,
-            distanciaKm = ultimaDistancia,
-            onSelectionConfirmed = { latSel, lonSel, _ ->
+            distanciaKm = if (intentos == 0) ultimaDistancia else null,
+            onSelectionConfirmed = if (yaJugado) null else { latSel, lonSel, _ ->
 
                 if (intentos <= 0) return@MapOSM
 
@@ -96,8 +110,7 @@ fun PantallaJuego(
                 }
 
                 val esAcierto = distancia <= radioNivel
-                val diferencia = maxOf(0.0, distancia - radioNivel)
-                ultimaDistancia = diferencia
+                ultimaDistancia = distancia
 
                 if (esAcierto) {
                     aciertos++
@@ -110,11 +123,10 @@ fun PantallaJuego(
                 }
 
                 if (intentos == 0) {
-
                     EstadoJuego.resultadoSitio[sitio.id] = aciertos > 0
+                    EstadoJuego.seleccionJugador[sitio.id] = ultimaSeleccion!!
 
                     if (EstadoJuego.juegoCompletado(ImagenesSitios.size)) {
-
                         PuntuacionesRepo.guardarPuntuacion(
                             EstadoJuego.nombreJugador.value,
                             Puntuacion(
@@ -125,27 +137,23 @@ fun PantallaJuego(
                             )
                         )
                     }
-
-                    navController.navigate(Navegador.Carrousel.ruta) {
-                        popUpTo(Navegador.Carrousel.ruta) { inclusive = true }
-                    }
                 }
             }
         )
 
-        // ✅ MENSAJE DE DISTANCIA (BIEN PUESTO FUERA)
+        // Mostrar distancia o resultado
         if (ultimaDistancia != null) {
             Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
+                modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)
             ) {
                 Surface(
                     tonalElevation = 8.dp,
                     shape = MaterialTheme.shapes.extraLarge
                 ) {
                     Text(
-                        text = if (ultimaDistancia == 0.0)
+                        text = if (yaJugado)
+                            "📌 Distancia final: ${"%.2f".format(ultimaDistancia)} km"
+                        else if (ultimaDistancia == 0.0)
                             "🎯 ¡Dentro del radio!"
                         else
                             "📍 Te faltaron ${"%.2f".format(ultimaDistancia)} km",
@@ -155,31 +163,16 @@ fun PantallaJuego(
             }
         }
 
-        // BOTÓN IA
-        FilledTonalButton(
-            onClick = { mostrarDialogoAI = true },
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp),
-            enabled = intentos > 0 && ayudasUsadas < nivel.ayuda
-        ) {
-            Text("🤖 ${nivel.ayuda - ayudasUsadas}/${nivel.ayuda}")
-        }
-
         // FOTO + INFO
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
+            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
         ) {
 
             Card(
                 shape = MaterialTheme.shapes.extraLarge,
                 elevation = CardDefaults.cardElevation(8.dp),
-                modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth(0.4f)
+                modifier = Modifier.height(120.dp).fillMaxWidth(0.4f)
             ) {
                 Image(
                     painter = painterResource(id = sitio.imagen),
@@ -202,12 +195,18 @@ fun PantallaJuego(
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("Intentos")
-                        Text("$intentos", style = MaterialTheme.typography.headlineSmall)
+                        Text(
+                            if (yaJugado) "Finalizado" else "$intentos",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
                     }
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Tiempo")
-                        Text("${tiempo}s", style = MaterialTheme.typography.headlineSmall)
+                        Text(stringResource(R.string.tiempo))
+                        Text(
+                            if (yaJugado) "-" else "${tiempo}s",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
                     }
                 }
             }
