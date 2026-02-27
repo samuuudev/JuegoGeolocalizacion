@@ -3,14 +3,17 @@ package com.mycompany.juegogeolocalizacion.pantallas
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -32,6 +35,7 @@ val recordsEjemplo = listOf(
     RecordPartida("05/02/2026", 90, 200, 1)
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaRecords(
     records: List<RecordPartida> = recordsEjemplo
@@ -47,30 +51,79 @@ fun PantallaRecords(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.records),
-            style = MaterialTheme.typography.headlineMedium
-        )
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.records),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            )
+        }
+    ) { paddingValues ->
 
-        Spacer(modifier = Modifier.height(24.dp))
+        val mejorPuntuacion = records.maxOfOrNull { it.puntuacionTotal }
 
         LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(records) { record ->
-                Card(
-                    modifier = Modifier.fillMaxSize()
+
+            itemsIndexed(records.sortedByDescending { it.puntuacionTotal }) { index, record ->
+
+                val esMejor = record.puntuacionTotal == mejorPuntuacion
+
+                ElevatedCard(
+                    shape = MaterialTheme.shapes.large,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = if (esMejor)
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
+                            MaterialTheme.colorScheme.surface
+                    )
                 ) {
+
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text("${R.string.fecha}: ${record.fecha}")
-                        Text("${R.string.puntuacionT}: ${record.puntuacionTotal}")
-                        Text("${R.string.tiempoT}: ${record.tiempoTotalSegundos} segundos")
-                        Text("${R.string.aciertos}: ${record.aciertos}")
+
+                        // Cabecera con posición
+                        Text(
+                            text = if (esMejor) "🏆 #${index + 1}" else "#${index + 1}",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = if (esMejor)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Text(
+                            text = "${stringResource(R.string.fecha)}: ${record.fecha}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Text(
+                            text = "${stringResource(R.string.puntuacionT)}: ${record.puntuacionTotal}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Text(
+                            text = "${stringResource(R.string.tiempoT)}: ${record.tiempoTotalSegundos}s",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Text(
+                            text = "${stringResource(R.string.aciertos)}: ${record.aciertos}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }

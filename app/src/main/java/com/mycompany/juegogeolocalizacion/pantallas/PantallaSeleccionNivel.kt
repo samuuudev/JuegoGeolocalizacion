@@ -1,28 +1,44 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
+import android.os.Bundle
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mycompany.juegogeolocalizacion.R
 
+class MainActivity : ComponentActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge()
+
+        setContent {
+            PantallaSeleccionNivel(
+                onSeleccionado = { nivel ->
+                    Log.d("MainActivity", "Nivel seleccionado: $nivel")
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaSeleccionNivel(
     onSeleccionado: (Int) -> Unit
 ) {
+
     DisposableEffect(Unit) {
         Log.d("PantallaSeleccionNivel", "Pantalla cargada")
         onDispose {
@@ -30,54 +46,75 @@ fun PantallaSeleccionNivel(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Titulo
-        Text(
-            text = stringResource(R.string.selecciona_nivel),
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Boton para seleccionar el tipo de juego facil
-        Button(
-            onClick = {
-                Log.d("PantallaSeleccionNivel", "Usuario seleccionó nivel: Fácil (1)")
-                onSeleccionado(1)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.facil))
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("") },
+                navigationIcon = {
+                    Row {
+                        TextButton(onClick = { }) { Text("📊") }
+                        TextButton(onClick = { }) { Text("🏆") }
+                    }
+                },
+                actions = {
+                    TextButton(onClick = { }) { Text("⚙️") }
+                    TextButton(onClick = { }) { Text("ℹ️") }
+                }
+            )
         }
+    ) { paddingValues ->
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Boton para seleccionar el tipo de juego medio
-        Button(
-            onClick = {
-                Log.d("PantallaSeleccionNivel", "Usuario seleccionó nivel: Medio (2)")
-                onSeleccionado(2)
-            },
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(stringResource(R.string.medio))
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineLarge
+            )
 
-        // Boton para seleccionar el tipo de juego dificil
-        Button(
-            onClick = {
-                Log.d("PantallaSeleccionNivel", "Usuario seleccionó nivel: Difícil (3)")
-                onSeleccionado(3)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.dificil))
+            Text(
+                text = stringResource(R.string.selecciona_nivel),
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            Button(
+                onClick = { onSeleccionado(1) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2E7D32),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(stringResource(R.string.facil))
+            }
+
+            Button(
+                onClick = { onSeleccionado(2) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFF9A825),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(stringResource(R.string.medio))
+            }
+
+            Button(
+                onClick = { onSeleccionado(3) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFC62828),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(stringResource(R.string.dificil))
+            }
         }
     }
 }

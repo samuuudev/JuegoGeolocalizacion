@@ -11,7 +11,6 @@ import com.mycompany.juegogeolocalizacion.datos.CambiadorIdioma
 import com.mycompany.juegogeolocalizacion.datos.CambiadorSonido
 import com.mycompany.juegogeolocalizacion.datos.Nivel
 import com.mycompany.juegogeolocalizacion.datos.NivelActual
-import com.mycompany.juegogeolocalizacion.datos.NivelActual.nivel
 import com.mycompany.juegogeolocalizacion.pantallas.PantallaAjustes
 import com.mycompany.juegogeolocalizacion.pantallas.PantallaJuego
 import com.mycompany.juegogeolocalizacion.pantallas.PantallaPuntuaciones

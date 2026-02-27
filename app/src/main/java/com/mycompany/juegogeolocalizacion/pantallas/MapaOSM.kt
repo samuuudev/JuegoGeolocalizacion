@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,10 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.Slider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +48,7 @@ import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapOSM(
     sitio: Lugar,
@@ -90,7 +97,24 @@ fun MapOSM(
     // Guardamos referencias a las overlays que añadimos para poder eliminarlas al actualizar la selección
     var currentSelectionOverlays by remember { mutableStateOf<List<Overlay>>(emptyList()) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    text = sitio.nombre,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        )
+
         AndroidView(
             factory = { ctx ->
                 Log.d("MapOSM", "Creando MapView")
@@ -243,34 +267,68 @@ fun MapOSM(
             }
         )
 
-        // Bottom bar con slider y botones cuando hay selección para confirmar o cancelar y ajustar el radio de seleccion (1 - 10 km)
         if (selectedPoint != null) {
-            Column(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Radio: ${String.format(Locale.getDefault(), "%.1f", radiusKm)} km")
-                Slider(
-                    value = radiusKm,
-                    onValueChange = { newV -> radiusKm = newV },
-                    valueRange = 1f..10f,
-                    steps = 8,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
-                )
 
-                Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Button(onClick = {
-                        // Cancelar selección
-                        Log.d("MapOSM", "Selección cancelada")
-                        selectedPoint = null
-                    }) {
-                        Text(stringResource(R.string.cancelar))
-                    }
+            Surface(
+                tonalElevation = 6.dp,
+                shadowElevation = 8.dp,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-                    Button(onClick = {
-                        // Confirma la seleccion y notifica a la pantalla correspondiente con lat, lon y radio
-                        val (sLat, sLon) = selectedPoint!!
-                        Log.d("MapOSM", "Confirm selection invoked: lat=$sLat lon=$sLon radiusKm=$radiusKm")
-                        onSelectionConfirmed?.invoke(sLat, sLon, radiusKm)
-                    }) {
-                        Text(stringResource(R.string.confirmar))
+                    Text(
+                        text = "Selecciona el radio",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "${String.format(Locale.getDefault(), "%.1f", radiusKm)} km",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Slider(
+                        value = radiusKm,
+                        onValueChange = { radiusKm = it },
+                        valueRange = 1f..10f,
+                        steps = 8,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+
+                        OutlinedButton(
+                            onClick = { selectedPoint = null },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(R.string.cancelar))
+                        }
+
+                        FilledTonalButton(
+                            onClick = {
+                                val (sLat, sLon) = selectedPoint!!
+                                onSelectionConfirmed?.invoke(sLat, sLon, radiusKm)
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(R.string.confirmar))
+                        }
                     }
                 }
             }

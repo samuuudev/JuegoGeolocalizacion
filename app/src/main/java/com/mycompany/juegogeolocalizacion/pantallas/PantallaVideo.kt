@@ -4,13 +4,17 @@ import android.net.Uri
 import android.util.Log
 import android.widget.MediaController
 import android.widget.VideoView
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -23,6 +27,7 @@ import com.mycompany.juegogeolocalizacion.modelo.ImagenesSitios
 import com.mycompany.juegogeolocalizacion.R
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaVideo(
     idSitio: Int,
@@ -46,57 +51,79 @@ fun PantallaVideo(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
-    ) {
-        Text(
-            text = sitio.nombre,
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        AndroidView(
-            modifier = Modifier.fillMaxSize().weight(1f),
-            factory = {
-                Log.d("PantallaVideo", "Creando VideoView")
-                VideoView(context).apply {
-                    val uri = Uri.parse("android.resource://${context.packageName}/${sitio.video}")
-                    Log.d("PantallaVideo", "URI del video: $uri")
-                    setVideoURI(uri)
-
-                    val controller = MediaController(context)
-                    controller.setAnchorView(this)
-                    setMediaController(controller)
-
-                    setOnPreparedListener { mp ->
-                        Log.d("PantallaVideo", "Video preparado - Duración: ${mp.duration}ms")
-                        start()
-                    }
-
-                    setOnCompletionListener {
-                        Log.d("PantallaVideo", "Video completado")
-                    }
-
-                    setOnErrorListener { _, what, extra ->
-                        Log.e("PantallaVideo", "ERROR reproduciendo video: what=$what, extra=$extra")
-                        true
-                    }
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = sitio.nombre,
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
-            }
-        )
+            )
+        }
+    ) { paddingValues ->
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                Log.d("PantallaVideo", "Usuario presionó botón Volver")
-                onVolver()
-            },
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Text(stringResource(R.string.volver))
+
+            ElevatedCard(
+                shape = MaterialTheme.shapes.extraLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = {
+                        Log.d("PantallaVideo", "Creando VideoView")
+
+                        VideoView(context).apply {
+                            val uri = Uri.parse(
+                                "android.resource://${context.packageName}/${sitio.video}"
+                            )
+
+                            setVideoURI(uri)
+
+                            val controller = MediaController(context)
+                            controller.setAnchorView(this)
+                            setMediaController(controller)
+
+                            setOnPreparedListener { mp ->
+                                Log.d("PantallaVideo", "Video preparado - Duración: ${mp.duration}ms")
+                                start()
+                            }
+
+                            setOnCompletionListener {
+                                Log.d("PantallaVideo", "Video completado")
+                            }
+
+                            setOnErrorListener { _, what, extra ->
+                                Log.e(
+                                    "PantallaVideo",
+                                    "ERROR reproduciendo video: what=$what, extra=$extra"
+                                )
+                                true
+                            }
+                        }
+                    }
+                )
+            }
+
+            FilledTonalButton(
+                onClick = {
+                    Log.d("PantallaVideo", "Usuario presionó botón Volver")
+                    onVolver()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.volver))
+            }
         }
     }
-
 }

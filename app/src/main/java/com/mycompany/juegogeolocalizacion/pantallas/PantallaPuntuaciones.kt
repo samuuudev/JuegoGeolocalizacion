@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -26,6 +30,21 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+<<<<<<< Updated upstream
+=======
+data class ResultadosLugar(
+    val id: Int,
+    val nombre: String,
+    val imagen: Int,
+    val tiempoSegundos: Int,
+    val puntuacion: Int,
+    val acertado: Boolean
+)
+val resultadosEjemplo = listOf(
+    ResultadosLugar(1, "Plaza Mayor", R.drawable.plaza, 32, 70, true),
+    ResultadosLugar(2, "La Giralda", R.drawable.coliseo, 55, 30, false) )
+@OptIn(ExperimentalMaterial3Api::class)
+>>>>>>> Stashed changes
 @Composable
 fun PantallaPuntuaciones() {
     Log.d("PantallaPuntuaciones", "Pantalla cargada")
@@ -61,6 +80,7 @@ fun PantallaPuntuaciones() {
         return
     }
 
+<<<<<<< Updated upstream
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -154,6 +174,106 @@ fun PantallaPuntuaciones() {
                             ) {
                                 Text("Intentos: ${acierto.intentosUsados}", style = MaterialTheme.typography.bodySmall)
                                 Text("Distancia: ${"%.2f".format(acierto.distanciaKm)} km", style = MaterialTheme.typography.bodySmall)
+=======
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.puntuacionT),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            )
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+
+            Surface(
+                tonalElevation = 6.dp,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.puntuacionT),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+
+                    Text(
+                        text = "$puntuacion",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(resultados) { res ->
+
+                    ElevatedCard(
+                        shape = MaterialTheme.shapes.large,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Image(
+                                painter = painterResource(id = res.imagen),
+                                contentDescription = res.nombre,
+                                modifier = Modifier
+                                    .height(80.dp)
+                                    .width(100.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+
+                                Text(
+                                    text = res.nombre,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                Text(
+                                    text = if (res.acertado)
+                                        stringResource(R.string.acertado)
+                                    else
+                                        stringResource(R.string.fallado),
+                                    color = if (res.acertado)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+
+                                Text(
+                                    text = "${stringResource(R.string.tiempo)}: ${res.tiempoSegundos}s",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+
+                                Text(
+                                    text = "${stringResource(R.string.puntuacion)}: ${res.puntuacion}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+>>>>>>> Stashed changes
                             }
                         }
                     }

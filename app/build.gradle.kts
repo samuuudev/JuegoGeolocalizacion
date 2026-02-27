@@ -52,6 +52,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.animation)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

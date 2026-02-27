@@ -1,6 +1,7 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,69 +44,101 @@ fun PantallaAjustes(
     var idioma by remember { mutableStateOf("ES") }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+
         Text(
             text = stringResource(R.string.ajustes),
             style = MaterialTheme.typography.headlineMedium
         )
 
-        // Para activar o desactivar el sonido
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize()
+        // Sonido
+        Surface(
+            tonalElevation = 4.dp,
+            shape = MaterialTheme.shapes.large,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.sonido))
-            Switch(
-                checked = sonidoActivado,
-                onCheckedChange = {
-                    Log.d("PantallaAjustes", "Cambio sonido: $sonidoActivado -> $it")
-                    sonidoActivado = it
-                    CambiadorSonido.setSonidoActivado(it)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.sonido),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = if (sonidoActivado) "Activado" else "Desactivado",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-            )
+
+                Switch(
+                    checked = sonidoActivado,
+                    onCheckedChange = {
+                        sonidoActivado = it
+                        CambiadorSonido.setSonidoActivado(it)
+                    }
+                )
+            }
         }
 
-        // Para seleccionar el idioma
-        Column {
-            Text(stringResource(R.string.idioma))
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+        // Idioma
+        Surface(
+            tonalElevation = 4.dp,
+            shape = MaterialTheme.shapes.large,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp)
             ) {
-                Button(
-                    onClick = {
-                        Log.d("PantallaAjustes", "Cambiando idioma a: ES")
-                        idioma = "ES"
-                        onIdiomaChange("es")
-                    }
-                ) {
-                    Text(stringResource(R.string.espaniol))
-                }
+                Text(
+                    text = stringResource(R.string.idioma),
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-                Button(
-                    onClick = {
-                        Log.d("PantallaAjustes", "Cambiando idioma a: EN")
-                        idioma = "EN"
-                        onIdiomaChange("en")
-                    }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(stringResource(R.string.ingles))
+
+                    FilledTonalButton(
+                        onClick = {
+                            idioma = "ES"
+                            onIdiomaChange("es")
+                        },
+                        enabled = idioma != "ES"
+                    ) {
+                        Text(stringResource(R.string.espaniol))
+                    }
+
+                    FilledTonalButton(
+                        onClick = {
+                            idioma = "EN"
+                            onIdiomaChange("en")
+                        },
+                        enabled = idioma != "EN"
+                    ) {
+                        Text(stringResource(R.string.ingles))
+                    }
                 }
             }
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-            onClick = {
-                Log.d("PantallaAjustes", "Usuario presionó Volver")
-                onVolver()
-            },
-            modifier = Modifier.fillMaxWidth()
+        ElevatedButton(
+            onClick = { onVolver() },
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium
         ) {
             Text(stringResource(R.string.volver))
         }
