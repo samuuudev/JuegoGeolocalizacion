@@ -11,7 +11,7 @@ val ImagenesSitios = listOf(
         ciudad = "París",
         descripcion = "Estructura metálica emblemática construida a finales del siglo XIX, reconocida por su diseño innovador y su gran altura",
         imagen = R.drawable.torre,
-        video = 0,
+        video = R.raw.torre,
         latitud = 48.8584,
         longitud = 2.2945
     ),
@@ -22,7 +22,7 @@ val ImagenesSitios = listOf(
         ciudad = "Roma",
         descripcion = "Antiguo anfiteatro de gran tamaño utilizado para espectáculos públicos y eventos multitudinarios en la antigüedad",
         imagen = R.drawable.coliseo,
-        video = 0,
+        video = R.raw.coliseo,
         latitud = 41.8902,
         longitud = 12.4922
     ),
@@ -33,7 +33,7 @@ val ImagenesSitios = listOf(
         ciudad = "Nueva York",
         descripcion = "Escultura monumental que representa una figura femenina sosteniendo una antorcha como símbolo de esperanza y libertad",
         imagen = R.drawable.estatua,
-        video = 0,
+        video = R.raw.estatua,
         latitud = 40.6892,
         longitud = -74.0445
     ),
@@ -44,7 +44,7 @@ val ImagenesSitios = listOf(
         ciudad = "Madrid",
         descripcion = "Amplio espacio público rodeado de edificios históricos, utilizado tradicionalmente para reuniones y celebraciones",
         imagen = R.drawable.plaza,
-        video = 0,
+        video = R.raw.plaza,
         latitud =  40.4155,
         longitud = -3.7074
     ),
@@ -55,7 +55,7 @@ val ImagenesSitios = listOf(
         ciudad = "Río de Janeiro",
         descripcion = "Imponente estatua de gran altura situada en lo alto de una montaña, con los brazos extendidos en gesto de bienvenida",
         imagen = R.drawable.cristo,
-        video = 0,
+        video = R.raw.cristo,
         latitud = -22.9519,
         longitud = -43.2105
     )

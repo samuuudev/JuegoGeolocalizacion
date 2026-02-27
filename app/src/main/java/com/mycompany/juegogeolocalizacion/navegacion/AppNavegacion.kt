@@ -24,6 +24,7 @@ import com.mycompany.juegogeolocalizacion.pantallas.PantallaVideo
 fun AppNavegacion() {
     Log.d("AppNavegacion", "Inicializando sistema de navegación")
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     NavHost(
         navController = navController,
@@ -46,7 +47,7 @@ fun AppNavegacion() {
                         else -> Nivel(2, "Medio", 25.0, 4, 1)
                     }
                     NivelActual.nivel = nivelSeleccionado
-                    CambiadorSonido.repoducirSonido(context, R.raw.boton)
+                    CambiadorSonido.reproducirSonido(context, R.raw.boton)
                     navController.navigate(Navegador.Carrousel.ruta)
                 }
             )
@@ -61,7 +62,7 @@ fun AppNavegacion() {
                 navController = navController,
                 onSeleccionado = { id ->
                     Log.d("AppNavegacion", "Sitio seleccionado ID: $id")
-                    CambiadorSonido.repoducirSonido(context, R.raw.boton)
+                    CambiadorSonido.reproducirSonido(context, R.raw.boton)
                     navController.navigate(Navegador.Juego.create(id))
                 }
             )
@@ -78,16 +79,16 @@ fun AppNavegacion() {
         composable(Navegador.PanelPunt.ruta) {
             Log.d("AppNavegacion", "Navegando a: PantallaPuntuaciones")
             val context = LocalContext.current
-            CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
+            CambiadorSonido.reproducirSonido(context, R.raw.abrir_pantalla)
 
-            PantallaPuntuaciones()
+            PantallaPuntuaciones(context = context)
         }
 
         // Parte para la pantalla donde saldran los records
         composable(Navegador.Records.ruta) {
             Log.d("AppNavegacion", "Navegando a: PantallaRecords")
             val context = LocalContext.current
-            CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
+            CambiadorSonido.reproducirSonido(context, R.raw.abrir_pantalla)
             PantallaRecords()
         }
 
@@ -100,7 +101,7 @@ fun AppNavegacion() {
                 idSitio,
                 onVolver = {
                     Log.d("AppNavegacion", "Volviendo desde PantallaVideo")
-                    CambiadorSonido.repoducirSonido(context, R.raw.boton)
+                    CambiadorSonido.reproducirSonido(context, R.raw.boton)
                     navController.popBackStack()
                 }
             )
@@ -111,7 +112,7 @@ fun AppNavegacion() {
         composable(Navegador.Ajustes.ruta) {
             Log.d("AppNavegacion", "Navegando a: PantallaAjustes")
             val context = LocalContext.current
-            CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
+            CambiadorSonido.reproducirSonido(context, R.raw.abrir_pantalla)
 
             PantallaAjustes(
                 onIdiomaChange = { idioma ->
@@ -128,7 +129,7 @@ fun AppNavegacion() {
         composable(Navegador.Sobre.ruta) {
             Log.d("AppNavegacion", "Navegando a: PantallaSobre")
             val context = LocalContext.current
-            CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
+            CambiadorSonido.reproducirSonido(context, R.raw.abrir_pantalla)
 
             PantallaSobre()
         }

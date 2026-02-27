@@ -16,8 +16,8 @@ object CambiadorSonido {
         sonidoActivado = activado
     }
 
-    fun repoducirSonido(context: Context, sonido: Int) {
-        if(!sonidoActivado) {
+    fun reproducirSonido(context: Context, sonido: Int) {  // ← typo corregido
+        if (!sonidoActivado) {
             Log.d("CambiadorSonido", "Sonido desactivado - No se reproduce sonido ID=$sonido")
             return
         }
@@ -25,16 +25,10 @@ object CambiadorSonido {
         Log.d("CambiadorSonido", "Reproduciendo sonido ID=$sonido")
         try {
             val media = MediaPlayer.create(context, sonido)
-            if (media == null) {
-                Log.e("CambiadorSonido", "ERROR: No se pudo crear MediaPlayer para sonido ID=$sonido")
-                return
-            }
-            media.setOnCompletionListener {
-                Log.d("CambiadorSonido", "Sonido ID=$sonido completado - Liberando recursos")
-                it.release()
-            }
-            media.start()
-            Log.d("CambiadorSonido", "Sonido ID=$sonido iniciado correctamente")
+            media?.apply {
+                setOnCompletionListener { it.release() }
+                start()
+            } ?: Log.e("CambiadorSonido", "ERROR: No se pudo crear MediaPlayer para sonido ID=$sonido")
         } catch (e: Exception) {
             Log.e("CambiadorSonido", "ERROR reproduciendo sonido ID=$sonido: ${e.message}", e)
         }

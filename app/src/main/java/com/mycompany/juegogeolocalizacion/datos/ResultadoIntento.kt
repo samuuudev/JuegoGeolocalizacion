@@ -1,8 +1,8 @@
 package com.mycompany.juegogeolocalizacion.datos
 
 data class ResultadoIntento(
-    val numero: Int,
-    val acertado: Boolean,
+    val latitud: Double,
+    val longitud: Double,
     val distanciaKm: Double,
-    val direccion: Direccion
+    val acierto: Boolean
 )

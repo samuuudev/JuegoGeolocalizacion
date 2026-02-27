@@ -38,5 +38,9 @@
     <string name="tuNombre">Tu nombre</string>
     <string name="tocar">Toca para jugar</string>
     <string name="noPunt">No hay puntuaciones registradas</string>
+    <string name="selecciona_radio">Selecciona el radio</string>
+    <string name="sin_conexion">No hay conexión</string>
+    <string name="activado">Activado</string>
+    <string name="desactivado">Desactivado</string>
 
 </resources>

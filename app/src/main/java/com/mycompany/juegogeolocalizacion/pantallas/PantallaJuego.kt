@@ -1,5 +1,6 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -7,16 +8,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mycompany.juegogeolocalizacion.R
-import com.mycompany.juegogeolocalizacion.datos.EstadoJuego
+import com.mycompany.juegogeolocalizacion.datos.*
 import com.mycompany.juegogeolocalizacion.modelo.ImagenesSitios
-import com.mycompany.juegogeolocalizacion.datos.NivelActual
-import com.mycompany.juegogeolocalizacion.datos.Puntuacion
-import com.mycompany.juegogeolocalizacion.datos.PuntuacionesRepo
 import kotlinx.coroutines.delay
 import kotlin.math.*
 
@@ -27,6 +26,7 @@ fun PantallaJuego(
     navController: NavController
 ) {
 
+    val context = LocalContext.current
     val sitio = ImagenesSitios.find { it.id == idSitio }
     val nivel = NivelActual.nivel
 
@@ -38,14 +38,14 @@ fun PantallaJuego(
         ) {
             Text("Error cargando partida", color = MaterialTheme.colorScheme.error)
             Spacer(modifier = Modifier.height(16.dp))
-            FilledTonalButton(onClick = { navController.popBackStack() }) {
-                Text("Volver")
-            }
+            FilledTonalButton(onClick = {
+                CambiadorSonido.reproducirSonido(context, R.raw.boton)
+                navController.popBackStack()
+            }) { Text("Volver") }
         }
         return
     }
 
-    // Detectar si ya fue jugado
     val yaJugado = EstadoJuego.resultadoSitio.containsKey(sitio.id)
     val seleccionGuardada = EstadoJuego.seleccionJugador[sitio.id]
 
@@ -54,10 +54,12 @@ fun PantallaJuego(
     var aciertos by remember { mutableStateOf(0) }
     var tiempo by remember { mutableStateOf(0) }
 
+    var mostrarDialogoAI by remember { mutableStateOf(false) }
+    var ayudasUsadas by remember { mutableStateOf(0) }
+
     var ultimaSeleccion by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var ultimaDistancia by remember { mutableStateOf<Double?>(null) }
 
-    // Timer solo si no está jugado
     LaunchedEffect(Unit) {
         if (!yaJugado) {
             while (true) {
@@ -67,7 +69,6 @@ fun PantallaJuego(
         }
     }
 
-    // Si ya estaba jugado, cargar datos guardados
     LaunchedEffect(yaJugado) {
         if (yaJugado && seleccionGuardada != null) {
             ultimaSeleccion = seleccionGuardada
@@ -94,6 +95,7 @@ fun PantallaJuego(
                 if (intentos <= 0) return@MapOSM
 
                 ultimaSeleccion = Pair(latSel, lonSel)
+                CambiadorSonido.reproducirSonido(context, R.raw.acierto)
 
                 val distancia = calcularDistanciaKm(
                     latSel,
@@ -114,38 +116,33 @@ fun PantallaJuego(
 
                 if (esAcierto) {
                     aciertos++
-                    val puntosGanados =
-                        maxOf(0, 1000 - (nivel.intentos - intentos) * 150 - tiempo)
+                    val puntosGanados = maxOf(0, 1000 - (nivel.intentos - intentos) * 150 - tiempo)
                     puntuacion += puntosGanados
                     intentos = 0
+
+                    EstadoJuego.registrarIntento(sitio.id, latSel, lonSel, distancia, esAcierto)
+
+                    navController.navigate("video/${sitio.id}")
                 } else {
                     intentos--
+                    EstadoJuego.registrarIntento(sitio.id, latSel, lonSel, distancia, esAcierto)
                 }
 
-                if (intentos == 0) {
-                    EstadoJuego.resultadoSitio[sitio.id] = aciertos > 0
-                    EstadoJuego.seleccionJugador[sitio.id] = ultimaSeleccion!!
-
-                    if (EstadoJuego.juegoCompletado(ImagenesSitios.size)) {
-                        PuntuacionesRepo.guardarPuntuacion(
-                            EstadoJuego.nombreJugador.value,
-                            Puntuacion(
-                                fecha = System.currentTimeMillis().toString(),
-                                puntuacionT = puntuacion,
-                                tiempoT = tiempo,
-                                aciertos = aciertos
-                            )
-                        )
-                    }
+                if (intentos == 0 && !esAcierto) {
+                    val nuevaPuntuacion = Puntuacion(
+                        fecha = System.currentTimeMillis().toString(),
+                        puntuacionT = puntuacion,
+                        tiempoT = tiempo,
+                        aciertos = aciertos,
+                        historialAciertos = EstadoJuego.generarHistorialParaSitio(sitio, nivel)
+                    )
+                    PuntuacionesRepo.guardarPuntuacion(context, EstadoJuego.nombreJugador.value, nuevaPuntuacion)
                 }
             }
         )
 
-        // Mostrar distancia o resultado
         if (ultimaDistancia != null) {
-            Box(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)
-            ) {
+            Box(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
                 Surface(
                     tonalElevation = 8.dp,
                     shape = MaterialTheme.shapes.extraLarge
@@ -154,7 +151,7 @@ fun PantallaJuego(
                         text = if (yaJugado)
                             "📌 Distancia final: ${"%.2f".format(ultimaDistancia)} km"
                         else if (ultimaDistancia == 0.0)
-                            "🎯 ¡Dentro del radio!"
+                            "🎯 ¡Dentro del radio! "
                         else
                             "📍 Te faltaron ${"%.2f".format(ultimaDistancia)} km",
                         modifier = Modifier.padding(16.dp)
@@ -163,7 +160,15 @@ fun PantallaJuego(
             }
         }
 
-        // FOTO + INFO
+        FilledTonalButton(
+            onClick = {
+                CambiadorSonido.reproducirSonido(context, R.raw.boton)
+                mostrarDialogoAI = true
+            },
+            modifier = Modifier.align(Alignment.TopStart).padding(16.dp),
+            enabled = intentos > 0 && ayudasUsadas < nivel.ayuda
+        ) { Text("🤖 ${nivel.ayuda - ayudasUsadas}/${nivel.ayuda}") }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)

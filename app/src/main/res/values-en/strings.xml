@@ -39,4 +39,8 @@
     <string name="tuNombre">Your name</string>
     <string name="tocar">Tap to play</string>
     <string name="noPunt">No scores recorded</string>
+    <string name="selecciona_radio">Select the radius</string>
+    <string name="sin_conexion">There is no conextion</string>
+    <string name="activado">Activated</string>
+    <string name="desactivado">Desactivated</string>
 </resources>

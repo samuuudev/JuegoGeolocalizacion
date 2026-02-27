@@ -1,28 +1,11 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
-import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mycompany.juegogeolocalizacion.R
@@ -32,34 +15,22 @@ import com.mycompany.juegogeolocalizacion.datos.CambiadorSonido
 fun PantallaAjustes(
     onIdiomaChange: (String) -> Unit = {}
 ) {
-
-    DisposableEffect(Unit) {
-        Log.d("PantallaAjustes", "Pantalla cargada")
-        onDispose {
-            Log.d("PantallaAjustes", "Pantalla destruida")
-        }
-    }
-
     var sonidoActivado by remember { mutableStateOf(true) }
     var idioma by remember { mutableStateOf("ES") }
+    var context = LocalContext.current
+
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Spacer(modifier = Modifier.height(20.dp))
-
-        // Titulo
         Text(
             text = "⚙️ ${stringResource(R.string.ajustes)}",
             style = MaterialTheme.typography.headlineLarge
         )
 
-        // Sonido
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge,
@@ -68,13 +39,10 @@ fun PantallaAjustes(
             )
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
+                modifier = Modifier.fillMaxWidth().padding(24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Column {
                     Text(
                         text = "🔊 ${stringResource(R.string.sonido)}",
@@ -82,12 +50,11 @@ fun PantallaAjustes(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = if (sonidoActivado) "Activado" else "Desactivado",
+                        text = if (sonidoActivado) stringResource(R.string.activado) else stringResource(R.string.desactivado),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-
                 Switch(
                     checked = sonidoActivado,
                     onCheckedChange = {
@@ -98,7 +65,6 @@ fun PantallaAjustes(
             }
         }
 
-        // Idioma
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge,
@@ -106,23 +72,16 @@ fun PantallaAjustes(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp)
-            ) {
-
+            Column(modifier = Modifier.padding(24.dp)) {
                 Text(
                     text = "🌍 ${stringResource(R.string.idioma)}",
                     style = MaterialTheme.typography.titleLarge
                 )
-
                 Spacer(modifier = Modifier.height(20.dp))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     FilledTonalButton(
                         onClick = {
+                            CambiadorSonido.reproducirSonido(context, R.raw.boton)
                             idioma = "ES"
                             onIdiomaChange("es")
                         },
@@ -130,9 +89,9 @@ fun PantallaAjustes(
                     ) {
                         Text("🇪🇸 ${stringResource(R.string.espaniol)}")
                     }
-
                     FilledTonalButton(
                         onClick = {
+                            CambiadorSonido.reproducirSonido(context, R.raw.boton)
                             idioma = "EN"
                             onIdiomaChange("en")
                         },

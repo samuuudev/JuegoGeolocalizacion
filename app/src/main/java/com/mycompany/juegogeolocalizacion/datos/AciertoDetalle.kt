@@ -7,4 +7,3 @@ data class AciertoDetalle(
     val intentosUsados: Int,
     val distanciaKm: Double
 )
-

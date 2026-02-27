@@ -1,21 +1,10 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
@@ -23,26 +12,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mycompany.juegogeolocalizacion.R
+import com.mycompany.juegogeolocalizacion.datos.PuntuacionesRepo
 import com.mycompany.juegogeolocalizacion.datos.Record
-
-
-val recordsEjemplo = listOf(
-    Record("Carlos", "12/02/2026", 180, 120, 3),
-    Record("Lucía", "10/02/2026", 150, 140, 2),
-    Record("Miguel", "05/02/2026", 90, 200, 1)
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaRecords(
-    records: List<Record> = recordsEjemplo
-) {
+fun PantallaRecords() {
 
     DisposableEffect(Unit) {
         Log.d("PantallaRecords", "Pantalla cargada")
         onDispose {
             Log.d("PantallaRecords", "Pantalla destruida")
         }
+    }
+
+    // Convertir las puntuaciones guardadas en records
+    val records: List<Record> = PuntuacionesRepo.obtenerPuntuaciones().map { (nombre, puntuacion) ->
+        Record(
+            nombreJugador = nombre,
+            fecha = puntuacion.fecha,
+            puntuacionTotal = puntuacion.puntuacionT,
+            tiempoTotalSegundos = puntuacion.tiempoT,
+            aciertos = puntuacion.aciertos
+        )
     }
 
     val recordsOrdenados = records.sortedByDescending { it.puntuacionTotal }
@@ -89,7 +81,6 @@ fun PantallaRecords(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
 
-                        // Cabecera con medalla + nombre
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
