@@ -113,6 +113,13 @@ fun PantallaJuego(
     var listaIntentos by remember { mutableStateOf<List<com.mycompany.juegogeolocalizacion.datos.ResultadoIntento>>(emptyList()) }
     val context = LocalContext.current
 
+    // Estado para IA
+    var mostrarDialogoAI by remember { mutableStateOf(false) }
+    var pistasAI by remember { mutableStateOf<com.mycompany.juegogeolocalizacion.datos.AIPistas?>(null) }
+    var cargandoAI by remember { mutableStateOf(false) }
+    var errorAI by remember { mutableStateOf<String?>(null) }
+    var ayudasUsadas by remember { mutableStateOf(0) }
+
     // Estado para mostrar la línea entre selección y objetivo SOLO al final
     var ultimaSeleccion by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var ultimaDistancia by remember { mutableStateOf<Double?>(null) }
@@ -213,11 +220,40 @@ fun PantallaJuego(
 
             FilledTonalButton(
                 onClick = {
-                    CambiadorSonido.repoducirSonido(context, R.raw.boton)
+                    Log.d("PantallaJuego", "Usuario presionó botón de Ayuda IA")
+                    if (ayudasUsadas >= nivel.ayuda) {
+                        Log.w("PantallaJuego", "No quedan ayudas disponibles")
+                        errorAI = "No quedan ayudas disponibles para este nivel (${nivel.ayuda} máximo)"
+                        mostrarDialogoAI = true
+                    } else {
+                        cargandoAI = true
+                        errorAI = null
+                        pistasAI = null
+                        mostrarDialogoAI = true
+
+                        // Llamar a OpenAI para obtener pistas
+                        Log.d("PantallaJuego", "Solicitando pistas de IA para: ${sitio.nombre}")
+                        com.mycompany.juegogeolocalizacion.datos.OpenAIHelper.obtenerPistasTexto(sitio) { pistas, error ->
+                            Log.d("PantallaJuego", "Callback de IA ejecutado - Pistas: ${pistas != null}, Error: $error")
+                            if (pistas != null) {
+                                Log.d("PantallaJuego", "Pistas obtenidas: ${pistas.pistas.size} pistas")
+                                pistasAI = pistas
+                                ayudasUsadas++
+                                // Restar puntos por usar ayuda
+                                puntuacion = maxOf(0, puntuacion - 50)
+                                Log.d("PantallaJuego", "Puntuación reducida en 50 puntos. Nuevo total: $puntuacion")
+                            } else {
+                                Log.e("PantallaJuego", "Error obteniendo pistas: $error")
+                                errorAI = error ?: "No se pudieron obtener las pistas. Verifica tu conexión."
+                            }
+                            cargandoAI = false
+                        }
+                    }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = intentos > 0 && ayudasUsadas < nivel.ayuda
             ) {
-                Text(stringResource(R.string.ayuda))
+                Text("🤖 ${stringResource(R.string.ayuda)} (${nivel.ayuda - ayudasUsadas}/${nivel.ayuda})")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -389,6 +425,19 @@ fun PantallaJuego(
                     ) {
                         Text(stringResource(R.string.explorarMapa))
                     }
+                }
+            )
+        }
+
+        // Diálogo de pistas de IA
+        if (mostrarDialogoAI) {
+            DialogoPistasIA(
+                pistas = pistasAI,
+                cargando = cargandoAI,
+                error = errorAI,
+                onDismiss = {
+                    Log.d("PantallaJuego", "Usuario cerró diálogo de pistas")
+                    mostrarDialogoAI = false
                 }
             )
         }
