@@ -5,5 +5,6 @@ data class Puntuacion(
     val puntuacionT: Int,
     val tiempoT: Int,
     val aciertos: Int,
-    val historialAciertos: List<AciertoDetalle> = emptyList()
+    val historialAciertos: List<Partida> = emptyList()
 )
+

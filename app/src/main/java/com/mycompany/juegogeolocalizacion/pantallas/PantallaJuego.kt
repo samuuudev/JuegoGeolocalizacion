@@ -1,7 +1,6 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +35,7 @@ import com.mycompany.juegogeolocalizacion.modelo.ImagenesSitios
 import com.mycompany.juegogeolocalizacion.R
 import com.mycompany.juegogeolocalizacion.datos.CambiadorSonido
 import com.mycompany.juegogeolocalizacion.datos.NivelActual
+import com.mycompany.juegogeolocalizacion.datos.Partida
 import com.mycompany.juegogeolocalizacion.datos.Puntuacion
 import com.mycompany.juegogeolocalizacion.datos.PuntuacionesRepo.guardarPuntuacion
 import com.mycompany.juegogeolocalizacion.navegacion.Navegador
@@ -109,8 +109,8 @@ fun PantallaJuego(
     var mostrarDialogoFinal by remember { mutableStateOf(false) }
     var mensajeDialogoFinal by remember { mutableStateOf("") }
 
-    // Lista para registrar detalles de cada acierto
-    var acieertos by remember { mutableStateOf<List<com.mycompany.juegogeolocalizacion.datos.AciertoDetalle>>(emptyList()) }
+    // Lista para registrar los intentos realizados
+    var listaIntentos by remember { mutableStateOf<List<com.mycompany.juegogeolocalizacion.datos.ResultadoIntento>>(emptyList()) }
     val context = LocalContext.current
 
     // Estado para mostrar la línea entre selección y objetivo SOLO al final
@@ -224,134 +224,15 @@ fun PantallaJuego(
 
             Box(
                 modifier = Modifier.fillMaxWidth().weight(1f),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.TopCenter
             ) {
-                // Mensaje emergente en la parte superior del mapa
-                if (mostrarMensajeEmergente) {
-                    LaunchedEffect(Unit) {
-                        delay(2000)
-                        mostrarMensajeEmergente = false
-                    }
-
-<<<<<<< Updated upstream
-                    val distancia = calcularDistanciaKm(
-                        latSel, lonSel,
-                        sitio.latitud, sitio.longitud
-                    )
-                    Log.d("PantallaJuego", "Distancia calculada: ${"%.2f".format(distancia)} km")
-
-                    // Radio fijo por nivel
-                    val radioNivel = when (nivel.id) {
-                        1 -> 50.0  // Nivel Fácil: 50 km
-                        2 -> 25.0  // Nivel Medio: 25 km
-                        3 -> 10.0  // Nivel Difícil: 10 km
-                        else -> 25.0
-                    }
-                    Log.d("PantallaJuego", "Radio del nivel (${nivel.nombre}): $radioNivel km")
-
-                    // Decidir acierto usando el radio FIJO del nivel
-                    val esAcierto = distancia <= radioNivel
-                    if (esAcierto) {
-                        Log.i("PantallaJuego", "¡ACIERTO! Distancia dentro del radio del nivel")
-                        aciertos++
-                        val base = 1000
-                        val intentosUsados = nivel.intentos - intentos + 1
-                        val puntosGanados = maxOf(0, base - (intentosUsados - 1) * 150 - tiempo)
-                        puntuacion += puntosGanados
-                        Log.d("PantallaJuego", "Puntos ganados: $puntosGanados (Total: $puntuacion)")
-
-                        // Registrar detalle del acierto
-                        val detalle = com.mycompany.juegogeolocalizacion.datos.AciertoDetalle(
-                            nombreSitio = sitio.nombre,
-                            dificultad = nivel.nombre,
-                            puntos = puntosGanados,
-                            intentosUsados = intentosUsados,
-                            distanciaKm = distancia
-                        )
-                        acieertos = acieertos + detalle
-                        Log.d("PantallaJuego", "Acierto registrado: ${detalle.nombreSitio} - ${detalle.puntos} puntos")
-
-                        // Mostrar mensaje emergente corto
-                        mensajeEmergente = "✓ ¡Acertaste! +$puntosGanados puntos"
-                        mostrarMensajeEmergente = true
-
-                        Log.i("PantallaJuego", "¡ACIERTO! Terminando juego inmediatamente")
-                        intentos = 0
-                    } else {
-                        Log.i("PantallaJuego", "FALLO - Distancia fuera del radio del nivel")
-                        val direccion = obtenerDireccion(latSel, lonSel, sitio.latitud, sitio.longitud)
-                        Log.d("PantallaJuego", "Dirección sugerida: $direccion")
-
-                        // Mostrar mensaje emergente corto
-                        mensajeEmergente = "✗ Fallaste. Está más al $direccion"
-                        mostrarMensajeEmergente = true
-
-                        intentos--
-                    }
-
-                    Log.d("PantallaJuego", "Intentos restantes: $intentos")
-
-                    // Si se agotaron los intentos, mostrar diálogo final con línea y localización
-                    if (intentos == 0) {
-                        Log.i("PantallaJuego", "Juego terminado - Preparando diálogo final")
-
-                        // Guardar selección y distancia SOLO para mostrar en diálogo final
-                        ultimaSeleccion = Pair(latSel, lonSel)
-                        ultimaDistancia = distancia
-
-                        // Preparar mensaje final simple (solo info del último acierto)
-                        val distanciaStr = String.format(Locale.getDefault(), "%.2f", distancia)
-
-                        mensajeDialogoFinal = "Tu ubicación: (${String.format(Locale.getDefault(), "%.4f", latSel)}, ${String.format(Locale.getDefault(), "%.4f", lonSel)})\n" +
-                                "Ubicación real: (${String.format(Locale.getDefault(), "%.4f", sitio.latitud)}, ${String.format(Locale.getDefault(), "%.4f", sitio.longitud)})\n\n" +
-                                "Distancia: $distanciaStr km\n\n" +
-                                "Puntuación total: $puntuacion puntos"
-                        mostrarDialogoFinal = true
-
-                        Log.d("PantallaJuego", "Resultados finales: Puntos=$puntuacion, Tiempo=${tiempo}s, Aciertos=$aciertos")
-
-                        guardarPuntuacion(
-                            Puntuacion(
-                                fecha = fecha,
-                                puntuacionT = puntuacion,
-                                tiempoT = tiempo,
-                                aciertos = aciertos,
-                                historialAciertos = acieertos
-=======
-                    this@Column.AnimatedVisibility(visible = mostrarMensajeEmergente) {
-                        Surface(
-                            shape = MaterialTheme.shapes.medium,
-                            tonalElevation = 6.dp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        ) {
-                            Text(
-                                text = mensajeEmergente,
-                                modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = if (mensajeEmergente.startsWith("¡"))
-                                    MaterialTheme.colorScheme.primary
-                                else
-                                    MaterialTheme.colorScheme.error
->>>>>>> Stashed changes
-                            )
-                        }
-                    }
-                }
-
+                // Mapa
                 MapOSM(
                     sitio = sitio,
-                    targetPoint = if (ultimaSeleccion != null) Pair(
-                        sitio.latitud,
-                        sitio.longitud
-                    ) else null,
+                    targetPoint = if (ultimaSeleccion != null) Pair(sitio.latitud, sitio.longitud) else null,
                     distanciaKm = ultimaDistancia,
                     onSelectionConfirmed = { latSel, lonSel, radiusKm ->
-                        Log.d(
-                            "PantallaJuego",
-                            "Selección confirmada: lat=$latSel, lon=$lonSel, radioKm=$radiusKm"
-                        )
+                        Log.d("PantallaJuego", "Selección confirmada: lat=$latSel, lon=$lonSel, radioKm=$radiusKm")
                         CambiadorSonido.repoducirSonido(context, R.raw.tocar_mapa)
 
                         if (intentos <= 0) {
@@ -359,26 +240,29 @@ fun PantallaJuego(
                             return@MapOSM
                         }
 
-                        val distancia = calcularDistanciaKm(
-                            latSel, lonSel,
-                            sitio.latitud, sitio.longitud
-                        )
-                        Log.d(
-                            "PantallaJuego",
-                            "Distancia calculada: ${"%.2f".format(distancia)} km"
-                        )
+                        val distancia = calcularDistanciaKm(latSel, lonSel, sitio.latitud, sitio.longitud)
+                        Log.d("PantallaJuego", "Distancia calculada: ${"%.2f".format(distancia)} km")
 
-                        // Radio fijo por nivel
                         val radioNivel = when (nivel.id) {
-                            1 -> 50.0  // Nivel Fácil: 50 km
-                            2 -> 25.0  // Nivel Medio: 25 km
-                            3 -> 10.0  // Nivel Difícil: 10 km
+                            1 -> 50.0
+                            2 -> 25.0
+                            3 -> 10.0
                             else -> 25.0
                         }
                         Log.d("PantallaJuego", "Radio del nivel (${nivel.nombre}): $radioNivel km")
 
-                        // Decidir acierto usando el radio FIJO del nivel
                         val esAcierto = distancia <= radioNivel
+                        val direccionEnum = obtenerDireccionEnum(latSel, lonSel, sitio.latitud, sitio.longitud)
+
+                        val intentoNum = listaIntentos.size + 1
+                        val resultado = com.mycompany.juegogeolocalizacion.datos.ResultadoIntento(
+                            numero = intentoNum,
+                            acertado = esAcierto,
+                            distanciaKm = distancia,
+                            direccion = direccionEnum
+                        )
+                        listaIntentos = listaIntentos + resultado
+
                         if (esAcierto) {
                             Log.i("PantallaJuego", "¡ACIERTO! Distancia dentro del radio del nivel")
                             aciertos++
@@ -386,25 +270,18 @@ fun PantallaJuego(
                             val intentosUsados = nivel.intentos - intentos + 1
                             val puntosGanados = maxOf(0, base - (intentosUsados - 1) * 150 - tiempo)
                             puntuacion += puntosGanados
-                            Log.d(
-                                "PantallaJuego",
-                                "Puntos ganados: $puntosGanados (Total: $puntuacion)"
-                            )
+                            Log.d("PantallaJuego", "Puntos ganados: $puntosGanados (Total: $puntuacion)")
 
-                            // Mostrar mensaje emergente corto
                             mensajeEmergente = "¡Acertaste! +$puntosGanados puntos"
                             mostrarMensajeEmergente = true
 
-                            Log.i("PantallaJuego", "¡ACIERTO! Terminando juego inmediatamente")
                             intentos = 0
                         } else {
                             Log.i("PantallaJuego", "FALLO - Distancia fuera del radio del nivel")
-                            val direccion =
-                                obtenerDireccion(latSel, lonSel, sitio.latitud, sitio.longitud)
-                            Log.d("PantallaJuego", "Dirección sugerida: $direccion")
+                            val direccionTexto = obtenerDireccion(latSel, lonSel, sitio.latitud, sitio.longitud)
+                            Log.d("PantallaJuego", "Dirección sugerida: $direccionTexto")
 
-                            // Mostrar mensaje emergente corto
-                            mensajeEmergente = "Fallaste. Está más al $direccion"
+                            mensajeEmergente = "Fallaste. Está más al $direccionTexto"
                             mostrarMensajeEmergente = true
 
                             intentos--
@@ -412,44 +289,31 @@ fun PantallaJuego(
 
                         Log.d("PantallaJuego", "Intentos restantes: $intentos")
 
-                        // Si se agotaron los intentos, mostrar diálogo final con línea y localización
                         if (intentos == 0) {
                             Log.i("PantallaJuego", "Juego terminado - Preparando diálogo final")
 
-                            // Guardar selección y distancia SOLO para mostrar en diálogo final
                             ultimaSeleccion = Pair(latSel, lonSel)
                             ultimaDistancia = distancia
 
-                            // Preparar mensaje final detallado
                             val distanciaStr = String.format(Locale.getDefault(), "%.2f", distancia)
-                            mensajeDialogoFinal = "Tu ubicación: (${
-                                String.format(
-                                    Locale.getDefault(),
-                                    "%.4f",
-                                    latSel
-                                )
-                            }, ${String.format(Locale.getDefault(), "%.4f", lonSel)})\n" +
-                                    "Ubicación real: (${
-                                        String.format(
-                                            Locale.getDefault(),
-                                            "%.4f",
-                                            sitio.latitud
-                                        )
-                                    }, ${
-                                        String.format(
-                                            Locale.getDefault(),
-                                            "%.4f",
-                                            sitio.longitud
-                                        )
-                                    })\n\n" +
+                            mensajeDialogoFinal = "Tu ubicación: (${String.format(Locale.getDefault(), "%.4f", latSel)}, ${String.format(Locale.getDefault(), "%.4f", lonSel)})\n" +
+                                    "Ubicación real: (${String.format(Locale.getDefault(), "%.4f", sitio.latitud)}, ${String.format(Locale.getDefault(), "%.4f", sitio.longitud)})\n\n" +
                                     "Distancia: $distanciaStr km\n\n" +
                                     "Aciertos: $aciertos / ${nivel.intentos}\n" +
                                     "Puntuación total: $puntuacion puntos"
                             mostrarDialogoFinal = true
 
-                            Log.d(
-                                "PantallaJuego",
-                                "Resultados finales: Puntos=$puntuacion, Tiempo=${tiempo}s, Aciertos=$aciertos"
+                            Log.d("PantallaJuego", "Resultados finales: Puntos=$puntuacion, Tiempo=${tiempo}s, Aciertos=$aciertos")
+
+                            val partida = Partida(
+                                lugar = sitio,
+                                nivel = nivel,
+                                intentosRes = 0,
+                                ayudasRes = nivel.ayuda,
+                                completado = true,
+                                conseguido = aciertos > 0,
+                                puntuacion = puntuacion,
+                                intentos = listaIntentos
                             )
 
                             guardarPuntuacion(
@@ -457,16 +321,39 @@ fun PantallaJuego(
                                     fecha = fecha,
                                     puntuacionT = puntuacion,
                                     tiempoT = tiempo,
-                                    aciertos = aciertos
+                                    aciertos = aciertos,
+                                    historialAciertos = listOf(partida)
                                 )
                             )
-                            Log.d(
-                                "PantallaJuego",
-                                "Puntuación guardada - Esperando a que el usuario continúe"
-                            )
+                            Log.d("PantallaJuego", "Puntuación guardada - Esperando a que el usuario continúe")
                         }
                     }
                 )
+
+                // Mensaje emergente superpuesto - solo mostrar si es visible
+                if (mostrarMensajeEmergente) {
+                    LaunchedEffect(Unit) {
+                        delay(2000)
+                        mostrarMensajeEmergente = false
+                    }
+                    Surface(
+                        shape = MaterialTheme.shapes.medium,
+                        tonalElevation = 6.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        Text(
+                            text = mensajeEmergente,
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (mensajeEmergente.startsWith("¡"))
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             }
         }
 
@@ -531,4 +418,14 @@ fun obtenerDireccion(latTap: Double, lonTap: Double, latReal: Double, lonReal: D
         else -> ""
     }
     return listOf(ns, eo).filter { it.isNotEmpty() }.joinToString(" y ")
+}
+
+fun obtenerDireccionEnum(latTap: Double, lonTap: Double, latReal: Double, lonReal: Double): com.mycompany.juegogeolocalizacion.datos.Direccion {
+    val diffLat = latReal - latTap
+    val diffLon = lonReal - lonTap
+    return if (abs(diffLat) >= abs(diffLon)) {
+        if (diffLat > 0) com.mycompany.juegogeolocalizacion.datos.Direccion.NORTE else com.mycompany.juegogeolocalizacion.datos.Direccion.SUR
+    } else {
+        if (diffLon > 0) com.mycompany.juegogeolocalizacion.datos.Direccion.ESTE else com.mycompany.juegogeolocalizacion.datos.Direccion.OESTE
+    }
 }
