@@ -35,6 +35,7 @@ fun AppNavegacion() {
             val context = LocalContext.current
 
             PantallaSeleccionNivel(
+                navController = navController,
                 onSeleccionado = { nivelId ->
                     Log.d("AppNavegacion", "Nivel seleccionado: $nivelId")
                     // Crear el nivel según la selección
@@ -57,6 +58,7 @@ fun AppNavegacion() {
             val context = LocalContext.current
 
             PantallaSitiosCarrousel(
+                navController = navController,
                 onSeleccionado = { id ->
                     Log.d("AppNavegacion", "Sitio seleccionado ID: $id")
                     CambiadorSonido.repoducirSonido(context, R.raw.boton)
@@ -118,11 +120,6 @@ fun AppNavegacion() {
                         context = navController.context,
                         codigo = idioma
                     )
-                },
-                onVolver = {
-                    Log.d("AppNavegacion", "Volviendo desde PantallaAjustes")
-                    CambiadorSonido.repoducirSonido(context, R.raw.boton)
-                    navController.popBackStack()
                 }
             )
         }
@@ -133,13 +130,7 @@ fun AppNavegacion() {
             val context = LocalContext.current
             CambiadorSonido.repoducirSonido(context, R.raw.abrir_pantalla)
 
-            PantallaSobre(
-                onVolver = {
-                    Log.d("AppNavegacion", "Volviendo desde PantallaSobre")
-                    CambiadorSonido.repoducirSonido(context, R.raw.boton)
-                    navController.popBackStack()
-                }
-            )
+            PantallaSobre()
         }
     }
 }

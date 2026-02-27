@@ -1,8 +1,9 @@
 package com.mycompany.juegogeolocalizacion.datos
 
 data class Record(
-    val id: Int = 0,
-    val jugador: String,
-    val puntuacion: Int,
-    val fecha: Long
+    val nombreJugador: String,
+    val fecha: String,
+    val puntuacionTotal: Int,
+    val tiempoTotalSegundos: Int,
+    val aciertos: Int
 )

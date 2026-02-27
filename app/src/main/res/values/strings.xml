@@ -35,5 +35,6 @@
     <string name="resultadoFinal">Resultado final</string>
     <string name="errorNivel">Error: No se ha seleccionado ningún nivel</string>
     <string name="errorSitio">Error: No se encontró el sitio con ID</string>
+    <string name="tuNombre">Tu nombre</string>
 
 </resources>
