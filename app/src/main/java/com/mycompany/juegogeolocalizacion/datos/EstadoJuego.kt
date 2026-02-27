@@ -3,13 +3,6 @@ package com.mycompany.juegogeolocalizacion.datos
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 
-data class ResultadoIntento(
-    val latitud: Double,
-    val longitud: Double,
-    val distanciaKm: Double,
-    val acierto: Boolean
-)
-
 object EstadoJuego {
     var nombreJugador = mutableStateOf("")
 

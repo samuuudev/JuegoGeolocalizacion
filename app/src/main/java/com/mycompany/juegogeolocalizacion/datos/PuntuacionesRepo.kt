@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 object PuntuacionesRepo {
 

@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.CacheDrawModifierNode
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -28,6 +27,7 @@ import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 import java.util.Locale
+import kotlin.math.sqrt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,9 +106,14 @@ fun MapOSM(
 
                 val receiver = object : MapEventsReceiver {
                     override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                        p?.let { selectedPoint = Pair(it.latitude, it.longitude) }
+                        p?.let {
+                            selectedPoint = Pair(it.latitude, it.longitude)
+                            // Sonido al tocar mapa
+                            CambiadorSonido.reproducirSonido(context, R.raw.tocar_mapa)
+                        }
                         return true
                     }
+
                     override fun longPressHelper(p: GeoPoint?) = false
                 }
 
@@ -164,9 +169,22 @@ fun MapOSM(
                         }
                         FilledTonalButton(
                             onClick = {
-                                CambiadorSonido.reproducirSonido(context, R.raw.boton)
-                                selectedPoint?.let {
-                                    onSelectionConfirmed?.invoke(it.first, it.second, radiusKm)
+                                selectedPoint?.let { point ->
+                                    val distancia = targetPoint?.let { (tLat, tLon) ->
+                                        val latDiff = point.first - tLat
+                                        val lonDiff = point.second - tLon
+                                        // Aproximación sencilla en grados
+                                        sqrt(latDiff*latDiff + lonDiff*lonDiff)
+                                    } ?: 999.0
+
+                                    val esAcierto = distancia <= (radiusKm / 111.0) // 1 grado ~ 111 km
+                                    if (esAcierto) {
+                                        CambiadorSonido.reproducirSonido(context, R.raw.acierto)
+                                    } else {
+                                        CambiadorSonido.reproducirSonido(context, R.raw.fallo)
+                                    }
+
+                                    onSelectionConfirmed?.invoke(point.first, point.second, radiusKm)
                                 }
                             },
                             modifier = Modifier.weight(1f)

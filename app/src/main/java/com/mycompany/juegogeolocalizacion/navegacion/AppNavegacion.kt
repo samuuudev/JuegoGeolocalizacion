@@ -97,6 +97,8 @@ fun AppNavegacion() {
             val idSitio = backStackEntry.arguments?.getString("idSitio")!!.toInt()
             Log.d("AppNavegacion", "Navegando a: PantallaVideo con idSitio=$idSitio")
             val context = LocalContext.current
+
+            CambiadorSonido.reproducirSonido(context, R.raw.ver_video)
             PantallaVideo(
                 idSitio,
                 onVolver = {
