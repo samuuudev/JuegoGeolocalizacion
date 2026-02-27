@@ -51,7 +51,8 @@ fun PantallaSeleccionNivel(
                     onClick = {
                         navController.navigate(Navegador.PanelPunt.ruta)
                     },
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(50.dp),
+
                 ) {
                     Text(
                         text = "📊",

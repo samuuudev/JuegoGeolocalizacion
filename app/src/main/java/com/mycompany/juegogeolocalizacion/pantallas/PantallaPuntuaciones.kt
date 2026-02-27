@@ -1,14 +1,7 @@
 package com.mycompany.juegogeolocalizacion.pantallas
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
@@ -26,8 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.mycompany.juegogeolocalizacion.R
 import com.mycompany.juegogeolocalizacion.datos.PuntuacionesRepo
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,9 +33,28 @@ fun PantallaPuntuaciones() {
         }
     }
 
-    val ultimaPuntuacion = remember {
+    val ultimaEntrada = remember {
         PuntuacionesRepo.obtenerPuntuaciones().lastOrNull()
     }
+
+    if (ultimaEntrada == null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.noPunt),
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+        return
+    }
+
+    val nombreJugador = ultimaEntrada.first
+    val ultimaPuntuacion = ultimaEntrada.second
 
     Column(
         modifier = Modifier
@@ -60,16 +71,6 @@ fun PantallaPuntuaciones() {
             style = MaterialTheme.typography.headlineLarge
         )
 
-        if (ultimaPuntuacion == null) {
-
-            Text(
-                text = "No hay puntuaciones registradas",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            return@Column
-        }
-
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge,
@@ -84,9 +85,14 @@ fun PantallaPuntuaciones() {
             ) {
 
                 Text(
-                    text = "Resultado final",
+                    text = stringResource(R.string.resultadoFinal),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text = "Jugador: $nombreJugador",
+                    style = MaterialTheme.typography.titleMedium
                 )
 
                 Row(
@@ -94,10 +100,7 @@ fun PantallaPuntuaciones() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(stringResource(R.string.puntuacionT))
-                    Text(
-                        "${ultimaPuntuacion.puntuacionT} pts",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Text("${ultimaPuntuacion.puntuacionT} pts")
                 }
 
                 Row(
@@ -117,9 +120,10 @@ fun PantallaPuntuaciones() {
                 }
 
                 val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                val fecha = try {
+
+                val fechaFormateada = try {
                     formatter.format(Date(ultimaPuntuacion.fecha.toLong()))
-                } catch (_: Exception) {
+                } catch (e: Exception) {
                     ultimaPuntuacion.fecha
                 }
 
@@ -128,11 +132,7 @@ fun PantallaPuntuaciones() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(stringResource(R.string.fecha))
-                    Text(
-                        fecha,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Text(fechaFormateada)
                 }
             }
         }
@@ -191,13 +191,6 @@ fun PantallaPuntuaciones() {
                     }
                 }
             }
-
-        } else {
-
-            Text(
-                text = "No hay aciertos registrados",
-                style = MaterialTheme.typography.bodyMedium
-            )
         }
     }
 }

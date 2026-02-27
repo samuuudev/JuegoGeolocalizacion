@@ -37,4 +37,6 @@
     <string name="errorNivel">Error: No level has been selected</string>
     <string name="errorSitio">Error: Site not found with ID</string>
     <string name="tuNombre">Your name</string>
+    <string name="tocar">Tap to play</string>
+    <string name="noPunt">No scores recorded</string>
 </resources>

@@ -3,6 +3,7 @@ package com.mycompany.juegogeolocalizacion.pantallas
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,18 +11,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -34,12 +33,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mycompany.juegogeolocalizacion.R
+import com.mycompany.juegogeolocalizacion.datos.EstadoJuego
 import com.mycompany.juegogeolocalizacion.datos.Lugar
 import com.mycompany.juegogeolocalizacion.modelo.ImagenesSitios
-import com.mycompany.juegogeolocalizacion.navegacion.Navegador
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,8 +54,8 @@ fun PantallaSitiosCarrousel(
         }
     }
 
-    var nombreJugador by remember { mutableStateOf("") }
-    var nombreGuardado by remember { mutableStateOf(false) }
+    val nombreGuardado = EstadoJuego.nombreJugador.value.isNotBlank()
+    var nombreLocal by remember { mutableStateOf(EstadoJuego.nombreJugador.value) }
 
     Column(
         modifier = Modifier
@@ -69,65 +67,6 @@ fun PantallaSitiosCarrousel(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Row {
-                TextButton(
-                    onClick = {
-                        navController.navigate(Navegador.PanelPunt.ruta)
-                    },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Text(
-                        text = "📊",
-                        fontSize = 28.sp
-                    )
-                }
-                TextButton(
-                    onClick = {
-                        navController.navigate(Navegador.Records.ruta)
-                    },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Text(
-                        "🏆",
-                        fontSize = 28.sp
-                    )
-                }
-            }
-
-            Row {
-                TextButton(
-                    onClick = {
-                        navController.navigate(Navegador.Ajustes.ruta)
-                    },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Text(
-                        "⚙️",
-                        fontSize = 28.sp
-                    )
-                }
-                TextButton(
-                    onClick = {
-                        navController.navigate(Navegador.Sobre.ruta)
-                    },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Text(
-                        "ℹ️",
-                        fontSize = 28.sp
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
         Text(
             text = "🌍 ${stringResource(R.string.selecciona_lugar)}",
             style = MaterialTheme.typography.headlineLarge
@@ -135,10 +74,7 @@ fun PantallaSitiosCarrousel(
 
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLarge,
-            colors = CardDefaults.elevatedCardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+            shape = MaterialTheme.shapes.extraLarge
         ) {
 
             Row(
@@ -150,8 +86,8 @@ fun PantallaSitiosCarrousel(
             ) {
 
                 OutlinedTextField(
-                    value = nombreJugador,
-                    onValueChange = { nombreJugador = it },
+                    value = nombreLocal,
+                    onValueChange = { nombreLocal = it },
                     modifier = Modifier.weight(1f),
                     label = { Text(stringResource(R.string.tuNombre)) },
                     singleLine = true,
@@ -159,8 +95,10 @@ fun PantallaSitiosCarrousel(
                 )
 
                 FilledTonalButton(
-                    onClick = { nombreGuardado = true },
-                    enabled = nombreJugador.isNotBlank() && !nombreGuardado
+                    onClick = {
+                        EstadoJuego.nombreJugador.value = nombreLocal
+                    },
+                    enabled = nombreLocal.isNotBlank() && !nombreGuardado
                 ) {
                     Text(stringResource(R.string.confirmar))
                 }
@@ -172,13 +110,14 @@ fun PantallaSitiosCarrousel(
             style = MaterialTheme.typography.titleLarge
         )
 
-        // 🔹 Carrusel grande
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
 
             items(sitios) { sitio ->
+
+                val resultado = EstadoJuego.resultadoSitio[sitio.id]
 
                 ElevatedCard(
                     onClick = {
@@ -187,13 +126,10 @@ fun PantallaSitiosCarrousel(
                         }
                     },
                     shape = MaterialTheme.shapes.extraLarge,
-                    modifier = Modifier.width(320.dp),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                    modifier = Modifier.width(320.dp)
                 ) {
 
-                    Column {
+                    Box {
 
                         Image(
                             painter = painterResource(id = sitio.imagen),
@@ -204,15 +140,28 @@ fun PantallaSitiosCarrousel(
                             contentScale = ContentScale.Crop
                         )
 
-                        Column(
-                            modifier = Modifier.padding(20.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                        // Overlay si acertado/fallado
+                        if (resultado != null) {
+                            Surface(
+                                modifier = Modifier
+                                    .matchParentSize(),
+                                color = if (resultado)
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+                                else
+                                    MaterialTheme.colorScheme.error.copy(alpha = 0.35f)
+                            ) {}
+                        }
 
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .padding(20.dp),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
                             Text(
-                                text = "Toca para jugar",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.primary
+                                text = stringResource(R.string.tocar),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
