@@ -10,7 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mycompany.juegogeolocalizacion.R
+import com.mycompany.juegogeolocalizacion.ui.theme.BotonNivel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,94 +27,97 @@ fun PantallaSeleccionNivel(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("") },
-                navigationIcon = {
-                    Row {
-                        TextButton(onClick = { }) { Text("📊") }
-                        TextButton(onClick = { }) { Text("🏆") }
-                    }
-                },
-                actions = {
-                    TextButton(onClick = { }) { Text("⚙️") }
-                    TextButton(onClick = { }) { Text("ℹ️") }
-                }
-            )
-        }
-    ) { paddingValues ->
+    Column(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineLarge
-            )
+            Row {
+                TextButton(
+                    onClick = {
 
-            Text(
-                text = stringResource(R.string.selecciona_nivel),
-                style = MaterialTheme.typography.headlineSmall
-            )
+                    },
+                    modifier = Modifier.size(50.dp)
+                ) {
+                    Text(
+                        text = "📊",
+                        fontSize = 28.sp
+                    )
+                }
+                TextButton(
+                    onClick = {
 
-            Button(
-                onClick = { onSeleccionado(1) },
-                modifier = Modifier
-                    .width(260.dp)
-                    .height(60.dp),
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2E7D32),
-                    contentColor = Color.White
-                )
-            ) {
-                Text(
-                    text = "🟢 ${stringResource(R.string.facil)}",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                    },
+                    modifier = Modifier.size(50.dp)
+                ) {
+                    Text(
+                        "🏆",
+                        fontSize = 28.sp
+                    )
+                }
             }
 
-            Button(
-                onClick = { onSeleccionado(2) },
-                modifier = Modifier
-                    .width(260.dp)
-                    .height(60.dp),
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFF9A825),
-                    contentColor = Color.White
-                )
-            ) {
-                Text(
-                    text = "🟡 ${stringResource(R.string.medio)}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
+            Row {
+                TextButton(
+                    onClick = {
 
-            Button(
-                onClick = { onSeleccionado(3) },
-                modifier = Modifier
-                    .width(260.dp)
-                    .height(60.dp),
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFC62828),
-                    contentColor = Color.White
-                )
-            ) {
-                Text(
-                    text = "🔴 ${stringResource(R.string.dificil)}",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                    },
+                    modifier = Modifier.size(50.dp)
+                ) {
+                    Text(
+                        "⚙️",
+                        fontSize = 28.sp
+                    )
+                }
+                TextButton(
+                    onClick = {
+
+                    },
+                    modifier = Modifier.size(50.dp)
+                ) {
+                    Text(
+                        "ℹ️",
+                        fontSize = 28.sp
+                    )
+                }
             }
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.headlineLarge
+        )
+
+        Text(
+            text = stringResource(R.string.selecciona_nivel),
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+        BotonNivel(
+            texto = stringResource(R.string.facil),
+            colores = listOf(Color(0xFF43A047), Color(0xFF1B5E20))
+        ) { onSeleccionado(1) }
+
+        BotonNivel(
+            texto = stringResource(R.string.medio),
+            colores = listOf(Color(0xFFFDD835), Color(0xFFF9A825))
+        ) { onSeleccionado(2) }
+
+        BotonNivel(
+            texto = stringResource(R.string.dificil),
+            colores = listOf(Color(0xFFE53935), Color(0xFFB71C1C))
+        ) { onSeleccionado(3) }
     }
 }
 
