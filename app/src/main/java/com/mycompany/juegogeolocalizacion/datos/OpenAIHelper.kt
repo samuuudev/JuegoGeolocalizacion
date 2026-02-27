@@ -134,7 +134,7 @@ object OpenAIHelper {
                     Log.d(TAG, "Región: ${pistas.region}")
                     callback(pistas, null)
                 } else {
-                    Log.e(TAG, "❌ No se pudieron parsear las pistas")
+                    Log.e(TAG, "No se pudieron parsear las pistas")
                     callback(null, "Error parseando respuesta de OpenAI")
                 }
 
@@ -143,7 +143,7 @@ object OpenAIHelper {
                 Log.d(TAG, "=== FIN CONSULTA OPENAI ===\n")
 
             } catch (e: Exception) {
-                Log.e(TAG, "❌ EXCEPCIÓN en obtenerPistasTexto: ${e.message}")
+                Log.e(TAG, "EXCEPCIÓN en obtenerPistasTexto: ${e.message}")
                 Log.e(TAG, "Stack trace:", e)
                 callback(null, "Error: ${e.message}")
             }
